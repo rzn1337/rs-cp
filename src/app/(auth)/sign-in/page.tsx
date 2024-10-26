@@ -14,7 +14,7 @@ export default function SignIn() {
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-black flex items-center justify-center p-4">
             <Card className="w-full max-w-md bg-black text-white">
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold text-center">
@@ -63,7 +63,7 @@ export default function SignIn() {
                         </div>
                     </form>
                     <div className="mt-4 text-center text-sm">
-                        Don't have an account?{" "}
+                        Don&apos;t have an account?{" "}
                         <Link
                             href="/sign-up"
                             className="text-blue-500 hover:underline"
