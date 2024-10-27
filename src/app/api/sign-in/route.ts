@@ -51,6 +51,8 @@ export async function POST(request: Request) {
             httpOnly: true,
         });
 
+        console.log(response);
+
         return response;
     } catch (error) {
         return Response.json({ error: error }, { status: 500 });
