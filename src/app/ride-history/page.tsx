@@ -139,9 +139,10 @@ export default function RideHistory() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">My Rides</h1>
       <Tabs defaultValue="history" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="history">Booking History</TabsTrigger>
           <TabsTrigger value="created">Created Rides</TabsTrigger>
+          <TabsTrigger value="complaint">Create Complaint</TabsTrigger>
         </TabsList>
         <TabsContent value="history">
           <Card>
@@ -385,6 +386,212 @@ export default function RideHistory() {
             </CardContent>
           </Card>
         </TabsContent>
+        {/* <TabsContent value="complaint">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>My Complaints</CardTitle>
+                  <CardDescription>Manage your complaints</CardDescription>
+                </div>
+                <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Ride
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Create New Ride</DialogTitle>
+                      <DialogDescription>
+                        Enter the details for your new ride. Click create when you're done.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="create-from" className="text-right">
+                          From
+                        </Label>
+                        <Input
+                          id="create-from"
+                          name="from"
+                          value={newRide.from}
+                          onChange={(e) => handleInputChange(e, false)}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="create-to" className="text-right">
+                          To
+                        </Label>
+                        <Input
+                          id="create-to"
+                          name="to"
+                          value={newRide.to}
+                          onChange={(e) => handleInputChange(e, false)}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="create-date" className="text-right">
+                          Date
+                        </Label>
+                        <Input
+                          id="create-date"
+                          name="date"
+                          type="date"
+                          value={newRide.date}
+                          onChange={(e) => handleInputChange(e, false)}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="create-time" className="text-right">
+                          Time
+                        </Label>
+                        <Input
+                          id="create-time"
+                          name="time"
+                          type="time"
+                          value={newRide.time}
+                          onChange={(e) => handleInputChange(e, false)}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="create-price" className="text-right">
+                          Price
+                        </Label>
+                        <Input
+                          id="create-price"
+                          name="price"
+                          value={newRide.price}
+                          onChange={(e) => handleInputChange(e, false)}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="create-status" className="text-right">
+                          Status
+                        </Label>
+                        <Select
+                          onValueChange={(value) => handleStatusChange(value, false)}
+                          defaultValue={newRide.status}
+                        >
+                          <SelectTrigger className="col-span-3">
+                            <SelectValue placeholder="Select a status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Scheduled">Scheduled</SelectItem>
+                            <SelectItem value="En Route">En Route</SelectItem>
+                            <SelectItem value="Completed">Completed</SelectItem>
+                            <SelectItem value="Cancelled">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit" onClick={handleCreateRide}>Create Ride</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-2">
+                {currentRides.map((ride) => (
+                  <Card key={ride.id}>
+                    <CardHeader>
+                      <CardTitle className="flex justify-between items-center">
+                        <span>{ride.from} to {ride.to}</span>
+                        <Badge className={getStatusColor(ride.status)}>{ride.status}</Badge>
+                      </CardTitle>
+                      <CardDescription>
+                        <div className="flex items-center">
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {ride.date}
+                          <Clock className="ml-4 mr-2 h-4 w-4" />
+                          {ride.time}
+                        </div>
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex justify-between items-center mb-4">
+                        <div className="flex items-center text-muted-foreground">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          <span className="text-sm">{ride.from} → {ride.to}</span>
+                        </div>
+                        <p className="text-lg font-semibold">{ride.price}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold mb-2">Passengers:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {ride.passengers.map((passenger) => (
+                            <div key={passenger.id} className="relative">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage  src={`https://api.dicebear.com/6.x/initials/svg?seed=${passenger.name}`} />
+                                <AvatarFallback>{passenger.avatar}</AvatarFallback>
+                              </Avatar>
+                              <Button
+                                variant="destructive"
+                                size="icon"
+                                className="h-4 w-4 rounded-full absolute -top-1 -right-1"
+                                onClick={() => handleRemovePassenger(ride.id, passenger.id)}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex justify-between mt-4">
+                        <Button variant="outline" onClick={() => handleEditRide(ride)}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit Ride
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive">Cancel Ride</Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently cancel the ride.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleCancelRide(ride.id)}>
+                                Confirm
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              <div className="flex justify-between items-center mt-4">
+                <Button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <Button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent> */}
       </Tabs>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
