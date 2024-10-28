@@ -134,6 +134,7 @@ export default function RideHistory() {
   const indexOfFirstRide = indexOfLastRide - ridesPerPage
   const currentRides = createdRides.slice(indexOfFirstRide, indexOfLastRide)
   const totalPages = Math.ceil(createdRides.length / ridesPerPage)
+  const setComplaintFilter = (str) => {}
 
   return (
     <div className="container mx-auto p-4">
@@ -386,7 +387,7 @@ export default function RideHistory() {
             </CardContent>
           </Card>
         </TabsContent>
-        {/* <TabsContent value="complaint">
+         {/* <TabsContent value="complaint">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -591,7 +592,67 @@ export default function RideHistory() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent> */}
+        </TabsContent>  */}
+        <TabsContent value="complaints">
+      <Card>
+        <CardHeader>
+          <CardTitle>Complaints</CardTitle>
+          <CardDescription>View and manage complaints</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex gap-4 mb-4">
+              <Button variant="outline" onClick={() => setComplaintFilter('all')}>
+                All Complaints
+              </Button>
+              <Button variant="outline" onClick={() => setComplaintFilter('filed')}>
+                Filed by Me
+              </Button>
+              <Button variant="outline" onClick={() => setComplaintFilter('received')}>
+                Filed Against Me
+              </Button>
+            </div>
+            <div className="grid gap-4">
+              {[{id: 1, status: "Resolved", createdAt: "", type: "TYPE"}].map((complaint) => (
+                <Card key={complaint.id}>
+                  <CardHeader>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>Complaint #{complaint.id}</span>
+                      <Badge variant={complaint.status === 'Resolved' ? 'success' : 'warning'}>
+                        {complaint.status}
+                      </Badge>
+                    </CardTitle>
+                    <CardDescription>
+                      Filed on {new Date(complaint.createdAt).toLocaleDateString()}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="font-medium">Type</p>
+                        <Badge variant="outline">{complaint.type}</Badge>
+                      </div>
+                      <div>
+                        <p className="font-medium">Description</p>
+                        {/* <p className="text-sm text-gray-600">{complaint.description}</p> */}
+                      </div>
+                      <div>
+                        <p className="font-medium">Related Ride</p>
+                        <p className="text-sm">
+                          To from
+                          {/* {complaint.ride.from} to {complaint.ride.to} on{' '}
+                          {new Date(complaint.ride.date).toLocaleDateString()} */}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </TabsContent>
       </Tabs>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

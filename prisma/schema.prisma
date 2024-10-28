@@ -14,17 +14,20 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(cuid())
-  email        String     @unique
-  username     String     @unique
-  password     String
-  name         String?
-  role         Role       @default(USER)
-  status       UserStatus @default(PASSENGER)
-  profileImage String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  Vehicle      Vehicle[]
+  id                      String      @id @default(cuid())
+  email                   String      @unique
+  username                String      @unique
+  password                String
+  name                    String?
+  role                    Role        @default(USER)
+  status                  UserStatus  @default(PASSENGER)
+  profileImage            String?
+  createdAt               DateTime    @default(now())
+  updatedAt               DateTime    @updatedAt
+  Vehicle                 Vehicle[]
+  Ride                    Ride[]
+  complaintsAsComplainee  Complaint[] @relation("ComplaineeComplaints")
+  complaintsAsComplainant Complaint[] @relation("ComplainantComplaints")
 
   @@map("users") // follow naming conventions for relational dbs, nothing important
 }
@@ -48,6 +51,63 @@ model Vehicle {
   year         Int
   licensePlate String   @unique
   createdAt    DateTime @default(now())
+  Ride         Ride[]
 
   @@map("vehicles")
+}
+
+model Ride {
+  id           String      @id @default(cuid())
+  driverID     String
+  driver       User        @relation(fields: [driverID], references: [id])
+  vehicleID    String
+  vehicle      Vehicle     @relation(fields: [vehicleID], references: [id])
+  fare         Float
+  createdAt    DateTime    @default(now())
+  status       RideStatus  @default(SCHEDULED)
+  scheduledFor DateTime
+  date         DateTime
+  Route        Route[]
+  Complaint    Complaint[]
+
+  @@map("rides")
+}
+
+enum RideStatus {
+  SCHEDULED
+  COMPLETED
+  ENROUTE
+  CANCELLED
+}
+
+model Route {
+  id     String @id @default(cuid())
+  rideID String
+  ride   Ride   @relation(fields: [rideID], references: [id])
+  to     String
+  from   String
+
+  @@map("routes")
+}
+
+model Complaint {
+  id            String          @id @default(cuid())
+  subject       String
+  description   String?
+  complaineeID  String
+  complainantID String
+  createdAt     DateTime        @default(now())
+  rideID        String
+  status        ComplaintStatus @default(PENDING)
+  complainee    User            @relation("ComplaineeComplaints", fields: [complaineeID], references: [id])
+  complainant   User            @relation("ComplainantComplaints", fields: [complainantID], references: [id])
+  ride          Ride            @relation(fields: [rideID], references: [id])
+
+  @@map("complaints")
+}
+
+enum ComplaintStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
 }
