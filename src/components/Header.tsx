@@ -37,26 +37,26 @@ const Header = () => {
                         <Link href="/ride-history" className="hover:text-gray-300">
                             My Rides
                         </Link>
-                        <Link href="/drivers" className="hover:text-gray-300">
-                            Drivers
+                        <Link href="/user-ratings" className="hover:text-gray-300">
+                            Ratings
                         </Link>
-                        <Link href="/about" className="hover:text-gray-300">
-                            About
+                        <Link href="/ride-history" className="hover:text-gray-300">
+                            History
                         </Link>
                     </nav>
                 </div>
                 <div className="flex items-center space-x-4">
-                    <div className="relative hidden md:block">
+                    {/* <div className="relative hidden md:block">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         <Input
                             type="search"
                             placeholder="Search..."
                             className="pl-10 bg-gray-900 text-gray-100 border-gray-700"
                         />
-                    </div>
+                    </div> */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
+                            <Button onClick={handleLogout} variant="ghost" size="icon">
                                 <User className="h-5 w-5" />
                                 <span className="sr-only">User menu</span>
                             </Button>
