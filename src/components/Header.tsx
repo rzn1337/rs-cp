@@ -1,22 +1,41 @@
+"use client";
+
 import { Car, LogOut, Menu, Search, User } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+
 
 const Header = () => {
+    const router = useRouter()
+    const handleLogout = async () => {
+        const response = await axios.get("/api/sign-out");
+
+        if (response.status === 200) {
+            router.replace("/")
+        }
+    };
+
     return (
         <header className="border-b bg-black text-white">
-            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="container mx-auto px-2 py-2 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <Link href="/" className="flex items-center space-x-2">
                         <Car className="h-6 w-6" />
                         {/* <span className="text-xl font-bold">RideShare</span> */}
                     </Link>
                     <nav className="hidden md:flex space-x-4">
-                        <Link href="/rides" className="hover:text-gray-300">
-                            Rides
+                        <Link href="/ride-history" className="hover:text-gray-300">
+                            My Rides
                         </Link>
                         <Link href="/drivers" className="hover:text-gray-300">
                             Drivers
@@ -44,7 +63,7 @@ const Header = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             align="end"
-                            className="w-56 bg-gray-800 text-gray-100 border-gray-700"
+                            className="w-56 bg-black text-gray-100 border-gray-700"
                         >
                             <DropdownMenuItem>
                                 <Link href="/profile" className="flex w-full">
@@ -57,7 +76,10 @@ const Header = () => {
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem>
-                                <button className="flex w-full items-center">
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex w-full items-center"
+                                >
                                     <LogOut className="mr-2 h-4 w-4" />
                                     <span>Log out</span>
                                 </button>
