@@ -58,7 +58,11 @@ export default function UserProfile() {
     const [vehicles, setVehicles] = useState([]);
 
     useEffect(() => {
-        const fetchVehicles = async () => {};
+        const fetchVehicles = async () => {
+            const response = await axios.get("/api/get-vehicles");
+            console.log(response);
+            setVehicles(response.data.data);
+        };
         fetchVehicles();
     }, []);
 
