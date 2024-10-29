@@ -216,6 +216,9 @@ export default function Dashboard() {
                                 <strong>To:</strong> {selectedRide.to}
                             </p>
                             <p>
+                                <strong>Vehicle:</strong> Toyota Camry
+                            </p>
+                            <p>
                                 <strong>Date:</strong> {selectedRide.date}
                             </p>
                             <p>

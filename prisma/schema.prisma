@@ -68,7 +68,7 @@ model Ride {
   status       RideStatus  @default(SCHEDULED)
   scheduledFor DateTime
   date         DateTime
-  Route        Route[]
+  Route        Route?
   Complaint    Complaint[]
 
   @@map("rides")
@@ -83,7 +83,7 @@ enum RideStatus {
 
 model Route {
   id     String @id @default(cuid())
-  rideID String
+  rideID String @unique
   ride   Ride   @relation(fields: [rideID], references: [id])
   to     String
   from   String
