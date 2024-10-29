@@ -29,17 +29,17 @@ export async function POST(request: Request) {
         }
 
         const tokenPayload = {
-            id: user,
-            username: user,
-            email: user,
+            id: user.id,
+            username: user.username,
+            email: user.email,
         };
 
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
 
         const token = await new jose.SignJWT(tokenPayload)
             .setProtectedHeader({ alg: "HS256" })
             .setIssuedAt()
-            .setExpirationTime("1h")
+            .setExpirationTime("72h")
             .sign(secret);
 
         const response = NextResponse.json({
