@@ -51,7 +51,7 @@ export async function POST(request: Request) {
             httpOnly: true,
         });
 
-        console.log(response);
+        console.log(token);
 
         return response;
     } catch (error) {

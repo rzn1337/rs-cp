@@ -48,6 +48,7 @@ model Vehicle {
   user         User     @relation(fields: [userID], references: [id])
   make         String
   model        String
+  seats        Int
   year         Int
   licensePlate String   @unique
   createdAt    DateTime @default(now())
