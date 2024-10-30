@@ -1,6 +1,5 @@
 import { getTokenData } from "@/app/helpers/getTokenData";
 import prisma from "@/app/lib/prisma";
-import { Vehicle } from "@/schema/vehicle";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -14,7 +13,7 @@ export async function GET(request: NextRequest) {
         });
 
         const response = NextResponse.json({
-            message: "Vehicle registered successfully",
+            message: "Vehicles fetched successfully",
             data: vehicles,
             success: true,
         });

@@ -2,22 +2,17 @@
 // import prisma from "@/app/lib/prisma";
 // import { NextRequest, NextResponse } from "next/server";
 
-// export async function POST(request: NextRequest) {
+// export async function GET(request: NextRequest) {
 //     try {
-//         const body = await request.json();
-//         const { make, model, year, licensePlate, seats } = body;
-
 //         const userID = (await getTokenData(request)) as string;
 
-//         const ride = await prisma.ride.create({
-//             data: {
-                
-//             },
+//         const createdRides = await prisma.ride.findMany({
+//             where: { driverID: userID },
 //         });
 
 //         const response = NextResponse.json({
-//             message: "Vehicle registered successfully",
-//             data: vehicle,
+//             message: "Created rides fetched successfully",
+//             data: createdRides,
 //             success: true,
 //         });
 

@@ -65,6 +65,7 @@ import {
     PlusIcon,
 } from "lucide-react";
 import ViewRideDetailsDialog from "@/components/ViewRideDetailsDialog";
+import CreatedRides from "@/components/CreatedRides";
 
 // Dummy data for ride history
 const rideHistory = [
@@ -178,6 +179,7 @@ export default function RideHistory() {
         { id: "2", name: "Honda Civic" },
         { id: "3", name: "Ford Mustang" },
     ];
+    // const [createdRides, setCreatedRides] = useState([]);
     const [createdRides, setCreatedRides] = useState(initialCreatedRides);
     const [editingRide, setEditingRide] = useState(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -189,7 +191,7 @@ export default function RideHistory() {
         time: "",
         price: "",
         status: "Scheduled",
-        passengers: [],
+        vehicle: "",
     });
 
     const handleCreateRide = () => {
@@ -376,183 +378,7 @@ export default function RideHistory() {
                     </Card>
                 </TabsContent>
                 <TabsContent value="created">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Created Rides</CardTitle>
-                            <CardDescription>
-                                Manage the rides you've created
-                            </CardDescription>
-                            <Button onClick={() => setIsCreateDialogOpen(true)}>
-                                <PlusIcon className="mr-2 h-4 w-4" />
-                                Create New Ride
-                            </Button>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid gap-4 md:grid-cols-2">
-                                {createdRides.map((ride) => (
-                                    <Card key={ride.id}>
-                                        <CardHeader>
-                                            <CardTitle className="flex justify-between items-center">
-                                                <span>
-                                                    {ride.from} to {ride.to}
-                                                </span>
-                                                <Badge
-                                                    className={getStatusColor(
-                                                        ride.status
-                                                    )}
-                                                >
-                                                    {ride.status}
-                                                </Badge>
-                                            </CardTitle>
-                                            <CardDescription>
-                                                <div className="flex items-center">
-                                                    <Calendar className="mr-2 h-4 w-4" />
-                                                    {ride.date}
-                                                    <Clock className="ml-4 mr-2 h-4 w-4" />
-                                                    {ride.time}
-                                                </div>
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div className="flex justify-between items-center mb-4">
-                                                <div className="flex items-center text-muted-foreground">
-                                                    <MapPin className="h-4 w-4 mr-1" />
-                                                    <span className="text-sm">
-                                                        {ride.from} → {ride.to}
-                                                    </span>
-                                                </div>
-                                                <p className="text-lg font-semibold">
-                                                    {ride.price}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <h4 className="font-semibold mb-2">
-                                                    Passengers:
-                                                </h4>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {ride.passengers.map(
-                                                        (passenger) => (
-                                                            <div
-                                                                key={
-                                                                    passenger.id
-                                                                }
-                                                                className="relative"
-                                                            >
-                                                                <Avatar className="h-8 w-8">
-                                                                    <AvatarImage
-                                                                        src={`https://api.dicebear.com/6.x/initials/svg?seed=${passenger.name}`}
-                                                                        alt={
-                                                                            passenger.name
-                                                                        }
-                                                                    />
-                                                                    <AvatarFallback>
-                                                                        {
-                                                                            passenger.avatar
-                                                                        }
-                                                                    </AvatarFallback>
-                                                                </Avatar>
-                                                                {ride.status ===
-                                                                    "Scheduled" && (
-                                                                    <Button
-                                                                        variant="destructive"
-                                                                        size="icon"
-                                                                        className="h-4 w-4 rounded-full absolute -top-1 -right-1"
-                                                                        onClick={() =>
-                                                                            handleRemovePassenger(
-                                                                                ride.id,
-                                                                                passenger.id
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        <X className="h-3 w-3" />
-                                                                        <span className="sr-only">
-                                                                            Remove
-                                                                            passenger
-                                                                        </span>
-                                                                    </Button>
-                                                                )}
-                                                            </div>
-                                                        )
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex justify-between mt-4">
-                                                {ride.status ===
-                                                    "Scheduled" && (
-                                                    <>
-                                                        <Button
-                                                            variant="outline"
-                                                            onClick={() => {
-                                                                setIsEditDialogOpen(
-                                                                    !isEditDialogOpen
-                                                                );
-                                                            }}
-                                                        >
-                                                            <Edit className="mr-2 h-4 w-4" />
-                                                            Edit Ride
-                                                        </Button>
-                                                        <AlertDialog>
-                                                            <AlertDialogTrigger
-                                                                asChild
-                                                            >
-                                                                <Button variant="destructive">
-                                                                    Cancel Ride
-                                                                </Button>
-                                                            </AlertDialogTrigger>
-                                                            <AlertDialogContent>
-                                                                <AlertDialogHeader>
-                                                                    <AlertDialogTitle>
-                                                                        Are you
-                                                                        sure?
-                                                                    </AlertDialogTitle>
-                                                                    <AlertDialogDescription>
-                                                                        This
-                                                                        action
-                                                                        cannot
-                                                                        be
-                                                                        undone.
-                                                                        This
-                                                                        will
-                                                                        permanently
-                                                                        cancel
-                                                                        the
-                                                                        ride.
-                                                                    </AlertDialogDescription>
-                                                                </AlertDialogHeader>
-                                                                <AlertDialogFooter>
-                                                                    <AlertDialogCancel>
-                                                                        Cancel
-                                                                    </AlertDialogCancel>
-                                                                    <AlertDialogAction
-                                                                        onClick={() =>
-                                                                            handleCancelRide(
-                                                                                ride.id
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        Confirm
-                                                                    </AlertDialogAction>
-                                                                </AlertDialogFooter>
-                                                            </AlertDialogContent>
-                                                        </AlertDialog>
-                                                    </>
-                                                )}
-                                                {ride.status !==
-                                                    "Scheduled" && (
-                                                    <Button
-                                                        variant="secondary"
-                                                        className="w-full"
-                                                    >
-                                                        View Details
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <CreatedRides />
                 </TabsContent>
                 <TabsContent value="complaints">
                     <Card>
@@ -600,6 +426,7 @@ export default function RideHistory() {
                 </TabsContent>
             </Tabs>
 
+            {/* complaint dialog */}
             <Dialog
                 open={isComplaintDialogOpen}
                 onOpenChange={setIsComplaintDialogOpen}
@@ -665,111 +492,6 @@ export default function RideHistory() {
                 </DialogContent>
             </Dialog>
 
-            <Dialog
-                open={isCreateDialogOpen}
-                onOpenChange={setIsCreateDialogOpen}
-            >
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Create New Ride</DialogTitle>
-                        <DialogDescription>
-                            Enter the details for your new ride.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="from" className="text-right">
-                                From
-                            </Label>
-                            <Input
-                                id="from"
-                                name="from"
-                                value={newRide.from}
-                                onChange={handleInputChange}
-                                className="col-span-3"
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="to" className="text-right">
-                                To
-                            </Label>
-                            <Input
-                                id="to"
-                                name="to"
-                                value={newRide.to}
-                                onChange={handleInputChange}
-                                className="col-span-3"
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="date" className="text-right">
-                                Date
-                            </Label>
-                            <Input
-                                id="date"
-                                name="date"
-                                type="date"
-                                value={newRide.date}
-                                onChange={handleInputChange}
-                                className="col-span-3"
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="time" className="text-right">
-                                Time
-                            </Label>
-                            <Input
-                                id="time"
-                                name="time"
-                                type="time"
-                                value={newRide.time}
-                                onChange={handleInputChange}
-                                className="col-span-3"
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="price" className="text-right">
-                                Price
-                            </Label>
-                            <Input
-                                id="price"
-                                name="price"
-                                value={newRide.price}
-                                onChange={handleInputChange}
-                                className="col-span-3"
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="car" className="text-right">
-                                Vehicle
-                            </Label>
-                            <Select
-                                onValueChange={handleCarSelect}
-                                value={newRide.carId}
-                            >
-                                <SelectTrigger className="col-span-3">
-                                    <SelectValue placeholder="Select a car" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {[
-                                        { id: "sad", name: "V1" },
-                                        { id: "av", name: "V2" },
-                                    ].map((car) => (
-                                        <SelectItem key={car.id} value={car.id}>
-                                            {car.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="submit" onClick={handleCreateRide}>
-                            Create Ride
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
 
             <Dialog
                 open={isCreateDialogOpen}

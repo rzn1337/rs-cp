@@ -1410,3 +1410,111 @@
           </Card>
         </TabsContent> */
 }
+
+{
+    /* <Dialog
+                open={isCreateDialogOpen}
+                onOpenChange={setIsCreateDialogOpen}
+            >
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Create New Ride</DialogTitle>
+                        <DialogDescription>
+                            Enter the details for your new ride.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="from" className="text-right">
+                                From
+                            </Label>
+                            <Input
+                                id="from"
+                                name="from"
+                                value={newRide.from}
+                                onChange={handleInputChange}
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="to" className="text-right">
+                                To
+                            </Label>
+                            <Input
+                                id="to"
+                                name="to"
+                                value={newRide.to}
+                                onChange={handleInputChange}
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="date" className="text-right">
+                                Date
+                            </Label>
+                            <Input
+                                id="date"
+                                name="date"
+                                type="date"
+                                value={newRide.date}
+                                onChange={handleInputChange}
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="time" className="text-right">
+                                Time
+                            </Label>
+                            <Input
+                                id="time"
+                                name="time"
+                                type="time"
+                                value={newRide.time}
+                                onChange={handleInputChange}
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="price" className="text-right">
+                                Price
+                            </Label>
+                            <Input
+                                id="price"
+                                name="price"
+                                value={newRide.price}
+                                onChange={handleInputChange}
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="car" className="text-right">
+                                Vehicle
+                            </Label>
+                            <Select
+                                onValueChange={handleCarSelect}
+                                value={newRide.carId}
+                            >
+                                <SelectTrigger className="col-span-3">
+                                    <SelectValue placeholder="Select a car" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[
+                                        { id: "sad", name: "V1" },
+                                        { id: "av", name: "V2" },
+                                    ].map((car) => (
+                                        <SelectItem key={car.id} value={car.id}>
+                                            {car.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="submit" onClick={handleCreateRide}>
+                            Create Ride
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog> */
+}
