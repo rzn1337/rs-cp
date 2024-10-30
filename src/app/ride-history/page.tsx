@@ -190,6 +190,7 @@ export default function RideHistory() {
     const [newRide, setNewRide] = useState({
         from: "",
         to: "",
+        to: "",
         date: "",
         time: "",
         price: "",
@@ -327,70 +328,7 @@ export default function RideHistory() {
             </Tabs>
 
             {/* complaint dialog */}
-            <Dialog
-                open={isComplaintDialogOpen}
-                onOpenChange={setIsComplaintDialogOpen}
-            >
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Submit a Complaint</DialogTitle>
-                        <DialogDescription>
-                            Please provide details about your complaint.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label
-                                htmlFor="complaintType"
-                                className="text-right"
-                            >
-                                Type
-                            </Label>
-                            <Select
-                                onValueChange={setComplaintType}
-                                value={complaintType}
-                            >
-                                <SelectTrigger className="col-span-3">
-                                    <SelectValue placeholder="Select complaint type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Driver">
-                                        Driver
-                                    </SelectItem>
-                                    <SelectItem value="Vehicle">
-                                        Vehicle
-                                    </SelectItem>
-                                    <SelectItem value="Passenger">
-                                        Other Passenger
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label
-                                htmlFor="complaintDescription"
-                                className="text-right"
-                            >
-                                Description
-                            </Label>
-                            <Textarea
-                                id="complaintDescription"
-                                value={complaintDescription}
-                                onChange={(e) =>
-                                    setComplaintDescription(e.target.value)
-                                }
-                                className="col-span-3"
-                                placeholder="Describe your complaint..."
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="submit" onClick={handleSubmitComplaint}>
-                            Submit Complaint
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            
 
 
             <Dialog

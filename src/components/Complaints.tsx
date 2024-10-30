@@ -298,50 +298,53 @@ const Complaints = () => {
         setComplaintType("");
         setComplaintDescription("");
     };
-  return (
-    <Card>
-                        <CardHeader>
-                            <CardTitle>My Complaints</CardTitle>
-                            <CardDescription>
-                                View and manage your complaints
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <ScrollArea className="h-[400px] w-full">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Ride ID</TableHead>
-                                            <TableHead>Against</TableHead>
-                                            <TableHead>Description</TableHead>
-                                            <TableHead>Status</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {complaints.map((complaint) => (
-                                            <TableRow key={complaint.id}>
-                                                <TableCell>
-                                                    {complaint.rideId}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {complaint.against}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {complaint.description}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">
-                                                        {complaint.status}
-                                                    </Badge>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </ScrollArea>
-                        </CardContent>
-                    </Card>
-  )
-}
+    return (
+        <>
+            <Card>
+                <CardHeader>
+                    <CardTitle>My Complaints</CardTitle>
+                    <CardDescription>
+                        View and manage your complaints
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ScrollArea className="h-[400px] w-full">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Ride ID</TableHead>
+                                    <TableHead>Against</TableHead>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead>Status</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {complaints.map((complaint) => (
+                                    <TableRow key={complaint.id}>
+                                        <TableCell>
+                                            {complaint.rideId}
+                                        </TableCell>
+                                        <TableCell>
+                                            {complaint.against}
+                                        </TableCell>
+                                        <TableCell>
+                                            {complaint.description}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline">
+                                                {complaint.status}
+                                            </Badge>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </ScrollArea>
+                </CardContent>
+            </Card>
+            
+        </>
+    );
+};
 
-export default Complaints
+export default Complaints;

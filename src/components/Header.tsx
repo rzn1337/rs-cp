@@ -1,6 +1,6 @@
 "use client";
 
-import { Car, LogOut, Menu, Search, User } from "lucide-react";
+import { Car, CarFront, LogOut, Menu, Search, User } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Input } from "./ui/input";
@@ -26,11 +26,11 @@ const Header = () => {
     };
 
     return (
-        <header className="border-b bg-black text-white">
+        <header className="border-b bg-white text-gray-400 text-xs">
             <div className="container mx-auto px-2 py-2 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <Link href="/" className="flex items-center space-x-2">
-                        <Car className="h-6 w-6" />
+                        <CarFront className="h-6 w-6" />
                         {/* <span className="text-xl font-bold">RideShare</span> */}
                     </Link>
                     <nav className="hidden md:flex space-x-4">
@@ -63,7 +63,7 @@ const Header = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             align="end"
-                            className="w-56 bg-black text-gray-100 border-gray-700"
+                            className="w-56 bg-white text-black"
                         >
                             <DropdownMenuItem>
                                 <Link href="/profile" className="flex w-full">

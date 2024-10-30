@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -300,71 +300,131 @@ const BookingHistory = () => {
         setComplaintType("");
         setComplaintDescription("");
     };
-  return (
-    <Card>
-                        <CardHeader>
-                            <CardTitle>Ride Booking History</CardTitle>
-                            <CardDescription>
-                                View all your past and upcoming rides
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <ScrollArea className="h-[400px] w-full">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>From</TableHead>
-                                            <TableHead>To</TableHead>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Price</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead>Actions</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {rideHistory.map((ride) => (
-                                            <TableRow key={ride.id}>
-                                                <TableCell>
-                                                    {ride.from}
-                                                </TableCell>
-                                                <TableCell>{ride.to}</TableCell>
-                                                <TableCell>
-                                                    {ride.date}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {ride.price}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge
-                                                        className={getStatusColor(
-                                                            ride.status
-                                                        )}
-                                                    >
-                                                        {ride.status}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            handleOpenComplaintDialog(
-                                                                ride
-                                                            )
-                                                        }
-                                                    >
-                                                        <AlertCircle className="mr-2 h-4 w-4" />
-                                                        Complain
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </ScrollArea>
-                        </CardContent>
-                    </Card>
-  )
-}
+    return (
+        <>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Ride Booking History</CardTitle>
+                    <CardDescription>
+                        View all your past and upcoming rides
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ScrollArea className="h-[400px] w-full">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>From</TableHead>
+                                    <TableHead>To</TableHead>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {rideHistory.map((ride) => (
+                                    <TableRow key={ride.id}>
+                                        <TableCell>{ride.from}</TableCell>
+                                        <TableCell>{ride.to}</TableCell>
+                                        <TableCell>{ride.date}</TableCell>
+                                        <TableCell>{ride.price}</TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                className={getStatusColor(
+                                                    ride.status
+                                                )}
+                                            >
+                                                {ride.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() =>
+                                                    handleOpenComplaintDialog(
+                                                        ride
+                                                    )
+                                                }
+                                            >
+                                                <AlertCircle className="mr-2 h-4 w-4" />
+                                                Complain
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </ScrollArea>
+                </CardContent>
+            </Card>
+            <Dialog
+                open={isComplaintDialogOpen}
+                onOpenChange={setIsComplaintDialogOpen}
+            >
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Submit a Complaint</DialogTitle>
+                        <DialogDescription>
+                            Please provide details about your complaint.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label
+                                htmlFor="complaintType"
+                                className="text-right"
+                            >
+                                Type
+                            </Label>
+                            <Select
+                                onValueChange={setComplaintType}
+                                value={complaintType}
+                            >
+                                <SelectTrigger className="col-span-3">
+                                    <SelectValue placeholder="Select complaint type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Driver">
+                                        Driver
+                                    </SelectItem>
+                                    <SelectItem value="Vehicle">
+                                        Vehicle
+                                    </SelectItem>
+                                    <SelectItem value="Passenger">
+                                        Other Passenger
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label
+                                htmlFor="complaintDescription"
+                                className="text-right"
+                            >
+                                Description
+                            </Label>
+                            <Textarea
+                                id="complaintDescription"
+                                value={complaintDescription}
+                                onChange={(e) =>
+                                    setComplaintDescription(e.target.value)
+                                }
+                                className="col-span-3"
+                                placeholder="Describe your complaint..."
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="submit" onClick={handleSubmitComplaint}>
+                            Submit Complaint
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
+};
 
-export default BookingHistory
+export default BookingHistory;
