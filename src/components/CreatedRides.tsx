@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+/* import { useEffect, useState } from "react";
 import {
     Card,
     CardContent,
@@ -19,15 +18,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -37,7 +27,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -55,57 +44,10 @@ import {
     Calendar,
     Clock,
     Edit,
-    Plus,
     CarFront,
     X,
-    AlertCircle,
-    Star,
     PlusIcon,
 } from "lucide-react";
-
-// Dummy data for ride history
-const rideHistory = [
-    {
-        id: 1,
-        from: "Downtown",
-        to: "Airport",
-        date: "2023-06-15",
-        time: "14:00",
-        price: "$25",
-        status: "Completed",
-        driver: "John Doe",
-    },
-    {
-        id: 2,
-        from: "Suburb",
-        to: "City Center",
-        date: "2023-06-16",
-        time: "09:30",
-        price: "$18",
-        status: "Completed",
-        driver: "Jane Smith",
-    },
-    {
-        id: 3,
-        from: "Beach",
-        to: "Mountain View",
-        date: "2023-06-17",
-        time: "11:15",
-        price: "$30",
-        status: "Completed",
-        driver: "Mike Johnson",
-    },
-    {
-        id: 4,
-        from: "University",
-        to: "Shopping Mall",
-        date: "2023-06-18",
-        time: "13:45",
-        price: "$15",
-        status: "Completed",
-        driver: "Sarah Brown",
-    },
-];
 
 // Dummy data for created rides
 const initialCreatedRides = [
@@ -299,6 +241,9 @@ const CreatedRides = () => {
         setComplaintType("");
         setComplaintDescription("");
     };
+
+    useEffect(() => {}, [])]
+
     return (
         <>
             <Card>
@@ -452,7 +397,9 @@ const CreatedRides = () => {
                                         )}
                                         {ride.status !== "Scheduled" && (
                                             <Button
-                                            onClick={() => setIsViewDialogOpen(true)}
+                                                onClick={() =>
+                                                    setIsViewDialogOpen(true)
+                                                }
                                                 variant="secondary"
                                                 className="w-full"
                                             >
@@ -568,7 +515,7 @@ const CreatedRides = () => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-            
+
             <Dialog open={false} onOpenChange={() => {}}>
                 <DialogContent className="sm:max-w-[525px]">
                     <DialogHeader>
@@ -918,9 +865,698 @@ const CreatedRides = () => {
                     </form>
                 </DialogContent>
             </Dialog>
-
         </>
     );
 };
 
 export default CreatedRides;
+ */
+
+
+/* import React, { useEffect, useState } from "react";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+    User,
+    MapPin,
+    Calendar,
+    Clock,
+    Edit,
+    CarFront,
+    X,
+    PlusIcon,
+    PlayCircle,
+} from "lucide-react";
+
+const initialCreatedRides = [
+    {
+        id: 1,
+        from: "Airport",
+        to: "Downtown",
+        date: "2023-07-20",
+        time: "10:00",
+        price: "$28",
+        status: "Scheduled",
+        passengers: [
+            { id: 1, name: "Alice Johnson", avatar: "AJ" },
+            { id: 2, name: "Bob Smith", avatar: "BS" },
+        ],
+    },
+    {
+        id: 2,
+        from: "City Center",
+        to: "Beach",
+        date: "2023-07-21",
+        time: "14:30",
+        price: "$22",
+        status: "Completed",
+        passengers: [
+            { id: 3, name: "Charlie Brown", avatar: "CB" },
+            { id: 4, name: "Diana Prince", avatar: "DP" },
+        ],
+    },
+];
+
+const CreatedRides = () => {
+    const [createdRides, setCreatedRides] = useState(initialCreatedRides);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [newRide, setNewRide] = useState({
+        from: "",
+        to: "",
+        date: "",
+        time: "",
+        price: "",
+        status: "Scheduled",
+        vehicle: "",
+    });
+
+    // Separate rides into scheduled and other
+    const scheduledRides = createdRides.filter(ride => ride.status === "Scheduled");
+    const otherRides = createdRides.filter(ride => ride.status !== "Scheduled");
+
+    const handleStartRide = (rideId) => {
+        setCreatedRides(rides =>
+            rides.map(ride =>
+                ride.id === rideId
+                    ? { ...ride, status: "En Route" }
+                    : ride
+            )
+        );
+    };
+
+    const getStatusColor = (status) => {
+        switch (status.toLowerCase()) {
+            case "completed":
+                return "bg-green-500";
+            case "en route":
+                return "bg-blue-500";
+            case "cancelled":
+                return "bg-red-500";
+            case "scheduled":
+                return "bg-yellow-500";
+            default:
+                return "bg-gray-500";
+        }
+    };
+
+    const RideCard = ({ ride }) => (
+        <Card key={ride.id} className="w-full">
+            <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                    <span>
+                        {ride.from} to {ride.to}
+                    </span>
+                    <Badge className={getStatusColor(ride.status)}>
+                        {ride.status}
+                    </Badge>
+                </CardTitle>
+                <CardDescription>
+                    <div className="flex items-center">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {ride.date}
+                        <Clock className="ml-4 mr-2 h-4 w-4" />
+                        {ride.time}
+                    </div>
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex justify-between items-center mb-4">
+                    <div className="flex items-center text-muted-foreground">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        <span className="text-sm">
+                            {ride.from} → {ride.to}
+                        </span>
+                    </div>
+                    <p className="text-lg font-semibold">
+                        {ride.price}
+                    </p>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-2">
+                        Passengers:
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                        {ride.passengers.map((passenger) => (
+                            <Avatar key={passenger.id} className="h-8 w-8">
+                                <AvatarImage
+                                    src={`https://api.dicebear.com/6.x/initials/svg?seed=${passenger.name}`}
+                                    alt={passenger.name}
+                                />
+                                <AvatarFallback>
+                                    {passenger.avatar}
+                                </AvatarFallback>
+                            </Avatar>
+                        ))}
+                    </div>
+                </div>
+                <div className="flex justify-between mt-4">
+                    {ride.status === "Scheduled" && (
+                        <div className="flex gap-2 w-full">
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsEditDialogOpen(true)}
+                                className="flex-1"
+                            >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                            </Button>
+                            <Button
+                                onClick={() => handleStartRide(ride.id)}
+                                className="flex-1 bg-blue-500 hover:bg-blue-600"
+                            >
+                                <PlayCircle className="mr-2 h-4 w-4" />
+                                Start Ride
+                            </Button>
+                        </div>
+                    )}
+                    {ride.status !== "Scheduled" && (
+                        <Button
+                            variant="secondary"
+                            className="w-full"
+                        >
+                            View Details
+                        </Button>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
+    );
+
+    return (
+        <div className="space-y-8">
+            {/* Scheduled Rides Section */
+//             <Card >
+//                 <CardHeader>
+//                     <div className="flex justify-between items-center">
+//                         <div>
+//                             <CardTitle>Scheduled Rides</CardTitle>
+//                             <CardDescription>
+//                                 Upcoming rides that need your attention
+//                             </CardDescription>
+//                         </div>
+//                         <Button onClick={() => setIsCreateDialogOpen(true)}>
+//                             <PlusIcon className="mr-2 h-4 w-4" />
+//                             Create New Ride
+//                         </Button>
+//                     </div>
+//                 </CardHeader>
+//                 <CardContent>
+//                     {scheduledRides.length === 0 ? (
+//                         <div className="text-center py-8 text-muted-foreground">
+//                             No scheduled rides at the moment
+//                         </div>
+//                     ) : (
+//                         <div className="grid gap-4 md:grid-cols-2">
+//                             {scheduledRides.map((ride) => (
+//                                 <RideCard key={ride.id} ride={ride} />
+//                             ))}
+//                         </div>
+//                     )}
+//                 </CardContent>
+//             </Card>
+
+//             {/* Other Rides Section */}
+//             <Card>
+//                 <CardHeader>
+//                     <CardTitle>Other Rides</CardTitle>
+//                     <CardDescription>
+//                         View your completed, en route, and cancelled rides
+//                     </CardDescription>
+//                 </CardHeader>
+//                 <CardContent>
+//                     {otherRides.length === 0 ? (
+//                         <div className="text-center py-8 text-muted-foreground">
+//                             No other rides to display
+//                         </div>
+//                     ) : (
+//                         <div className="grid gap-4 md:grid-cols-2">
+//                             {otherRides.map((ride) => (
+//                                 <RideCard key={ride.id} ride={ride} />
+//                             ))}
+//                         </div>
+//                     )}
+//                 </CardContent>
+//             </Card>
+//         </div>
+//     );
+// };
+
+// export default CreatedRides; 
+
+
+
+
+import React, { useState } from "react";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+    Calendar,
+    Clock,
+    Edit,
+    MapPin,
+    PlusIcon,
+    PlayCircle,
+} from "lucide-react";
+
+const initialCreatedRides = [
+    {
+        id: 1,
+        from: "Airport",
+        to: "Downtown",
+        date: "2023-07-20",
+        time: "10:00",
+        price: "$28",
+        status: "Scheduled",
+        passengers: [
+            { id: 1, name: "Alice Johnson", avatar: "AJ" },
+            { id: 2, name: "Bob Smith", avatar: "BS" },
+        ],
+    },
+    {
+        id: 2,
+        from: "City Center",
+        to: "Beach",
+        date: "2023-07-21",
+        time: "14:30",
+        price: "$22",
+        status: "Completed",
+        passengers: [
+            { id: 3, name: "Charlie Brown", avatar: "CB" },
+            { id: 4, name: "Diana Prince", avatar: "DP" },
+        ],
+    },
+];
+
+export default function CreatedRides() {
+    const [createdRides, setCreatedRides] = useState(initialCreatedRides);
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [editingRide, setEditingRide] = useState(null);
+    const [newRide, setNewRide] = useState({
+        from: "",
+        to: "",
+        date: "",
+        time: "",
+        price: "",
+        status: "Scheduled",
+        vehicle: "",
+    });
+
+    const scheduledRides = createdRides.filter(ride => ride.status === "Scheduled");
+    const otherRides = createdRides.filter(ride => ride.status !== "Scheduled");
+
+    const handleCreateRide = () => {
+        const createdRide = {
+            ...newRide,
+            id: createdRides.length + 1,
+            passengers: [],
+        };
+        setCreatedRides([...createdRides, createdRide]);
+        setIsCreateDialogOpen(false);
+        setNewRide({
+            from: "",
+            to: "",
+            date: "",
+            time: "",
+            price: "",
+            status: "Scheduled",
+            vehicle: "",
+        });
+    };
+
+    const handleEditRide = (ride) => {
+        setEditingRide(ride);
+        setIsEditDialogOpen(true);
+    };
+
+    const handleUpdateRide = () => {
+        setCreatedRides(rides =>
+            rides.map(ride =>
+                ride.id === editingRide.id ? editingRide : ride
+            )
+        );
+        setIsEditDialogOpen(false);
+        setEditingRide(null);
+    };
+
+    const handleCancelRide = (rideId) => {
+        setCreatedRides(rides =>
+            rides.map(ride =>
+                ride.id === rideId
+                    ? { ...ride, status: "Cancelled" }
+                    : ride
+            )
+        );
+    };
+
+    const handleStartRide = (rideId) => {
+        setCreatedRides(rides =>
+            rides.map(ride =>
+                ride.id === rideId
+                    ? { ...ride, status: "En Route" }
+                    : ride
+            )
+        );
+    };
+
+    const getStatusColor = (status) => {
+        switch (status.toLowerCase()) {
+            case "completed": return "bg-green-500";
+            case "en route": return "bg-blue-500";
+            case "cancelled": return "bg-red-500";
+            case "scheduled": return "bg-yellow-500";
+            default: return "bg-gray-500";
+        }
+    };
+
+    const RideCard = ({ ride }) => (
+        <Card key={ride.id} className="w-full">
+            <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                    <span>{ride.from} to {ride.to}</span>
+                    <Badge className={getStatusColor(ride.status)}>{ride.status}</Badge>
+                </CardTitle>
+                <CardDescription>
+                    <div className="flex items-center">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {ride.date}
+                        <Clock className="ml-4 mr-2 h-4 w-4" />
+                        {ride.time}
+                    </div>
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex justify-between items-center mb-4">
+                    <div className="flex items-center text-muted-foreground">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        <span className="text-sm">{ride.from} → {ride.to}</span>
+                    </div>
+                    <p className="text-lg font-semibold">{ride.price}</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-2">Passengers:</h4>
+                    <div className="flex flex-wrap gap-2">
+                        {ride.passengers.map((passenger) => (
+                            <Avatar key={passenger.id} className="h-8 w-8">
+                                <AvatarImage
+                                    src={`https://api.dicebear.com/6.x/initials/svg?seed=${passenger.name}`}
+                                    alt={passenger.name}
+                                />
+                                <AvatarFallback>{passenger.avatar}</AvatarFallback>
+                            </Avatar>
+                        ))}
+                    </div>
+                </div>
+                <div className="flex justify-between mt-4">
+                    {ride.status === "Scheduled" && (
+                        <div className="flex gap-2 w-full">
+                            <Button variant="outline" onClick={() => handleEditRide(ride)} className="flex-1">
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                            </Button>
+                            <Button onClick={() => handleStartRide(ride.id)} className="flex-1 bg-blue-500 hover:bg-blue-600">
+                                <PlayCircle className="mr-2 h-4 w-4" />
+                                Start Ride
+                            </Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" className="flex-1">Cancel Ride</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action cannot be undone. This will permanently cancel the ride.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleCancelRide(ride.id)}>
+                                            Confirm
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    )}
+                    {ride.status !== "Scheduled" && (
+                        <Button variant="secondary" className="w-full">
+                            View Details
+                        </Button>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
+    );
+
+    return (
+        <div className="space-y-8">
+            <Card>
+                <CardHeader>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>Scheduled Rides</CardTitle>
+                            <CardDescription>Upcoming rides that need your attention</CardDescription>
+                        </div>
+                        <Button onClick={() => setIsCreateDialogOpen(true)}>
+                            <PlusIcon className="mr-2 h-4 w-4" />
+                            Create New Ride
+                        </Button>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    {scheduledRides.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                            No scheduled rides at the moment
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 md:grid-cols-2">
+                            {scheduledRides.map((ride) => (
+                                <RideCard key={ride.id} ride={ride} />
+                            ))}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Other Rides</CardTitle>
+                    <CardDescription>View your completed, en route, and cancelled rides</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {otherRides.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                            No other rides to display
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 md:grid-cols-2">
+                            {otherRides.map((ride) => (
+                                <RideCard key={ride.id} ride={ride} />
+                            ))}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Create New Ride</DialogTitle>
+                        <DialogDescription>Enter the details for your new ride.</DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="from" className="text-right">From</Label>
+                            <Input
+                                id="from"
+                                value={newRide.from}
+                                onChange={(e) => setNewRide({ ...newRide, from: e.target.value })}
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="to" className="text-right">To</Label>
+                            <Input
+                                id="to"
+                                value={newRide.to}
+                                onChange={(e) => setNewRide({ ...newRide, to: e.target.value })}
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="date" className="text-right">Date</Label>
+                            <Input
+                                id="date"
+                                type="date"
+                                value={newRide.date}
+                                onChange={(e) => setNewRide({ ...newRide, date: e.target.value })}
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="time" className="text-right">Time</Label>
+                            <Input
+                                id="time"
+                                type="time"
+                                value={newRide.time}
+                                onChange={(e) => setNewRide({ ...newRide, time: e.target.value })}
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="price" className="text-right">Price</Label>
+                            <Input
+                                id="price"
+                                value={newRide.price}
+                                onChange={(e) => setNewRide({ ...newRide, price: e.target.value })}
+                                className="col-span-3"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="submit" onClick={handleCreateRide}>Create Ride</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Edit Ride</DialogTitle>
+                        <DialogDescription>Make changes to your ride here. Click save when you're done.</DialogDescription>
+                    </DialogHeader>
+                    {editingRide && (
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="edit-from" className="text-right">From</Label>
+                                <Input
+                                    id="edit-from"
+                                    value={editingRide.from}
+                                    onChange={(e) => setEditingRide({ ...editingRide, from: e.target.value })}
+                                    className="col-span-3"
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="edit-to" className="text-right">To</Label>
+                                <Input
+                                    id="edit-to"
+                                    value={editingRide.to}
+                                    onChange={(e) => setEditingRide({ ...editingRide, to: e.target.value })}
+                                    className="col-span-3"
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="edit-date" className="text-right">Date</Label>
+                                
+                                <Input
+                                    id="edit-date"
+                                    type="date"
+                                    value={editingRide.date}
+                                    onChange={(e) => setEditingRide({ ...editingRide, date: e.target.value })}
+                                    className="col-span-3"
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="edit-time" className="text-right">Time</Label>
+                                <Input
+                                    id="edit-time"
+                                    type="time"
+                                    value={editingRide.time}
+                                    onChange={(e) => setEditingRide({ ...editingRide, time: e.target.value })}
+                                    className="col-span-3"
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="edit-price" className="text-right">Price</Label>
+                                <Input
+                                    id="edit-price"
+                                    value={editingRide.price}
+                                    onChange={(e) => setEditingRide({ ...editingRide, price: e.target.value })}
+                                    className="col-span-3"
+                                />
+                            </div>
+                        </div>
+                    )}
+                    <DialogFooter>
+                        <Button type="submit" onClick={handleUpdateRide}>Save changes</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
+}
