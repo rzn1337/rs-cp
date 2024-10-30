@@ -66,6 +66,9 @@ import {
 } from "lucide-react";
 import ViewRideDetailsDialog from "@/components/ViewRideDetailsDialog";
 import CreatedRides from "@/components/CreatedRides";
+import BookingHistory from "@/components/BookingHistory";
+import Complaints from "@/components/Complaints";
+
 
 // Dummy data for ride history
 const rideHistory = [
@@ -313,116 +316,13 @@ export default function RideHistory() {
                     <TabsTrigger value="complaints">Complaints</TabsTrigger>
                 </TabsList>
                 <TabsContent value="history">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Ride Booking History</CardTitle>
-                            <CardDescription>
-                                View all your past and upcoming rides
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <ScrollArea className="h-[400px] w-full">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>From</TableHead>
-                                            <TableHead>To</TableHead>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Price</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead>Actions</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {rideHistory.map((ride) => (
-                                            <TableRow key={ride.id}>
-                                                <TableCell>
-                                                    {ride.from}
-                                                </TableCell>
-                                                <TableCell>{ride.to}</TableCell>
-                                                <TableCell>
-                                                    {ride.date}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {ride.price}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge
-                                                        className={getStatusColor(
-                                                            ride.status
-                                                        )}
-                                                    >
-                                                        {ride.status}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            handleOpenComplaintDialog(
-                                                                ride
-                                                            )
-                                                        }
-                                                    >
-                                                        <AlertCircle className="mr-2 h-4 w-4" />
-                                                        Complain
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </ScrollArea>
-                        </CardContent>
-                    </Card>
+                    <BookingHistory />
                 </TabsContent>
                 <TabsContent value="created">
                     <CreatedRides />
                 </TabsContent>
                 <TabsContent value="complaints">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>My Complaints</CardTitle>
-                            <CardDescription>
-                                View and manage your complaints
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <ScrollArea className="h-[400px] w-full">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Ride ID</TableHead>
-                                            <TableHead>Against</TableHead>
-                                            <TableHead>Description</TableHead>
-                                            <TableHead>Status</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {complaints.map((complaint) => (
-                                            <TableRow key={complaint.id}>
-                                                <TableCell>
-                                                    {complaint.rideId}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {complaint.against}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {complaint.description}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">
-                                                        {complaint.status}
-                                                    </Badge>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </ScrollArea>
-                        </CardContent>
-                    </Card>
+                    <Complaints />
                 </TabsContent>
             </Tabs>
 
