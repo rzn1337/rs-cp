@@ -68,7 +68,7 @@ model Ride {
   status       RideStatus  @default(SCHEDULED)
   scheduledFor DateTime
   date         DateTime
-  Route        Route?
+  route        Route?
   Complaint    Complaint[]
 
   @@map("rides")

@@ -117,45 +117,22 @@ const rideHistory = [
 // Dummy data for created rides
 const initialCreatedRides = [
     {
-        id: 1,
         from: "Airport",
         to: "Downtown",
         date: "2023-07-20",
         time: "10:00",
         price: "$28",
         status: "Completed",
-        passengers: [
-            { id: 1, name: "Alice Johnson", avatar: "AJ" },
-            { id: 2, name: "Bob Smith", avatar: "BS" },
-        ],
     },
     {
-        id: 2,
         from: "City Center",
         to: "Beach",
         date: "2023-07-21",
         time: "14:30",
         price: "$22",
         status: "Completed",
-        passengers: [
-            { id: 3, name: "Charlie Brown", avatar: "CB" },
-            { id: 4, name: "Diana Prince", avatar: "DP" },
-            { id: 5, name: "Ethan Hunt", avatar: "EH" },
-        ],
     },
-    {
-        id: 3,
-        from: "Airport",
-        to: "Downtown",
-        date: "2023-07-20",
-        time: "10:00",
-        price: "$28",
-        status: "Scheduled",
-        passengers: [
-            { id: 1, name: "Alice Johnson", avatar: "AJ" },
-            { id: 2, name: "Bob Smith", avatar: "BS" },
-        ],
-    },
+    
 ];
 
 // Dummy data for complaints
@@ -190,7 +167,6 @@ export default function RideHistory() {
     const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
     const [newRide, setNewRide] = useState({
         from: "",
-        to: "",
         to: "",
         date: "",
         time: "",
