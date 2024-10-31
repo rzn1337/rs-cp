@@ -109,6 +109,7 @@ export default function CreatedRides() {
         vehicleID: "",
     });
 
+
     const { toast } = useToast();
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -199,14 +200,14 @@ export default function CreatedRides() {
     };
 
     const getStatusColor = (status) => {
-        switch (status.toLowerCase()) {
-            case "completed":
+        switch (status) {
+            case "COMPLETED":
                 return "bg-green-500";
-            case "en route":
+            case "ENROUTE":
                 return "bg-blue-500";
-            case "cancelled":
+            case "CANCELLED":
                 return "bg-red-500";
-            case "scheduled":
+            case "SCHEDULED":
                 return "bg-yellow-500";
             default:
                 return "bg-gray-500";
@@ -220,16 +221,16 @@ export default function CreatedRides() {
                     <span>
                         {ride.route.from} to {ride.route.to}
                     </span>
-                    <Badge className={getStatusColor("scheduled")}>
+                    <Badge className={getStatusColor(ride.status)}>
                         {ride.status}
                     </Badge>
                 </CardTitle>
                 <CardDescription>
                     <div className="flex items-center">
                         <Calendar className="mr-2 h-4 w-4" />
-                        {ride.date}
+                        {new Date(ride.scheduledFor).toISOString().split('T')[0]}
                         <Clock className="ml-4 mr-2 h-4 w-4" />
-                        {ride.time}
+                        {new Date(ride.scheduledFor).toISOString().split('T')[1].split(".")[0]}
                     </div>
                 </CardDescription>
             </CardHeader>
@@ -238,10 +239,10 @@ export default function CreatedRides() {
                     <div className="flex items-center text-muted-foreground">
                         <MapPin className="h-4 w-4 mr-1" />
                         <span className="text-sm">
-                            {ride.from} → {ride.to}
+                            {ride.route.from} → {ride.route.to}
                         </span>
                     </div>
-                    <p className="text-lg font-semibold">{ride.fare}</p>
+                    <p className="text-lg font-semibold">${ride.fare}</p>
                 </div>
                 <div>
                     <h4 className="font-semibold mb-2">Passengers:</h4>
@@ -260,8 +261,8 @@ export default function CreatedRides() {
                     </div>
                 </div>
                 <div className="flex justify-between mt-4">
-                    {ride.status === "Scheduled" && (
-                        <div className="flex gap-2 w-full">
+                    {ride.status === "SCHEDULED" && (
+                        <div className="flex gap-2 w-auto">
                             <Button
                                 variant="outline"
                                 onClick={() => handleEditRide(ride)}
@@ -272,7 +273,7 @@ export default function CreatedRides() {
                             </Button>
                             <Button
                                 onClick={() => handleStartRide(ride.id)}
-                                className="flex-1 bg-blue-500 hover:bg-blue-600"
+                                className="flex-1 bg-green-500 hover:bg-green-600"
                             >
                                 <PlayCircle className="mr-2 h-4 w-4" />
                                 Start Ride
@@ -312,7 +313,7 @@ export default function CreatedRides() {
                             </AlertDialog>
                         </div>
                     )}
-                    {ride.status !== "Scheduled" && (
+                    {ride.status !== "SCHEDULED" && (
                         <Button variant="secondary" className="w-full">
                             View Details
                         </Button>
