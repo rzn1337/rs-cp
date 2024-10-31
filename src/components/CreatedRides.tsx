@@ -48,42 +48,6 @@ import {
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
-const initialCreatedRides = [
-    {
-        id: 1,
-        from: "Airport",
-        to: "Downtown",
-        date: "2023-07-20",
-        time: "10:00",
-        price: "$28",
-        status: "Scheduled",
-        passengers: [
-            { id: 1, name: "Alice Johnson", avatar: "AJ" },
-            { id: 2, name: "Bob Smith", avatar: "BS" },
-        ],
-    },
-    {
-        id: 2,
-        from: "City Center",
-        to: "Beach",
-        date: "2023-07-21",
-        time: "14:30",
-        price: "$22",
-        status: "Completed",
-        passengers: [
-            { id: 3, name: "Charlie Brown", avatar: "CB" },
-            { id: 4, name: "Diana Prince", avatar: "DP" },
-        ],
-    },
-];
-
-const vehicles = [
-    { id: 1, name: "Car" },
-    { id: 2, name: "Motorcycle" },
-    { id: 3, name: "Van" },
-    { id: 4, name: "Bicycle" },
-];
-
 interface Vehicle {
     createdAt: string;
     id: string;
@@ -109,7 +73,6 @@ export default function CreatedRides() {
         vehicleID: "",
     });
 
-
     const { toast } = useToast();
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -129,17 +92,10 @@ export default function CreatedRides() {
         fetchVehicles();
     }, []);
 
-    const scheduledRides = createdRides.filter(
-        (ride) => ride.status === "SCHEDULED"
-    );
-    const otherRides = createdRides.filter(
-        (ride) => ride.status !== "SCHEDULED"
-    );
-
     const handleCreateRide = async () => {
         // Optimistic UI update
-        const optimisticRides = [...createdRides, newRide];
-        setCreatedRides(optimisticRides);
+        // const optimisticRides = [...createdRides, newRide];
+        setCreatedRides((rides) => [...rides, newRide]);
         setIsCreateDialogOpen(false);
 
         try {
@@ -183,20 +139,54 @@ export default function CreatedRides() {
         setEditingRide(null);
     };
 
-    const handleCancelRide = (rideId) => {
+    const handleCancelRide = async (rideID) => {
         setCreatedRides((rides) =>
             rides.map((ride) =>
-                ride.id === rideId ? { ...ride, status: "Cancelled" } : ride
+                ride.id === rideID ? { ...ride, status: "CANCELLED" } : ride
             )
         );
+        const response = await axios.patch("/api/update-ride-status", {
+            rideID,
+            status: "CANCELLED",
+        });
+
+        console.log(response);
+
+        if (response.status === 200) {
+            toast({ title: "Your ride has been cancelled", variant: "destructive"});
+        }
     };
 
-    const handleStartRide = (rideId) => {
+    const handleStartRide = async (rideID) => {
         setCreatedRides((rides) =>
             rides.map((ride) =>
-                ride.id === rideId ? { ...ride, status: "En Route" } : ride
+                ride.id === rideID ? { ...ride, status: "ENROUTE" } : ride
             )
         );
+        const response = await axios.patch("/api/update-ride-status", {
+            rideID,
+            status: "ENROUTE",
+        });
+
+        if (response.status === 200) {
+            toast({ title: "Your ride has started" });
+        }
+    };
+
+    const handleEndRide = async (rideID) => {
+        setCreatedRides((rides) =>
+            rides.map((ride) =>
+                ride.id === rideID ? { ...ride, status: "COMPLETED" } : ride
+            )
+        );
+        const response = await axios.patch("/api/update-ride-status", {
+            rideID,
+            status: "COMPLETED",
+        });
+
+        if (response.status === 200) {
+            toast({ title: "Your ride has been completed" });
+        }
     };
 
     const getStatusColor = (status) => {
@@ -228,9 +218,18 @@ export default function CreatedRides() {
                 <CardDescription>
                     <div className="flex items-center">
                         <Calendar className="mr-2 h-4 w-4" />
-                        {new Date(ride.scheduledFor).toISOString().split('T')[0]}
+                        {
+                            new Date(ride.scheduledFor)
+                                .toISOString()
+                                .split("T")[0]
+                        }
                         <Clock className="ml-4 mr-2 h-4 w-4" />
-                        {new Date(ride.scheduledFor).toISOString().split('T')[1].split(".")[0]}
+                        {
+                            new Date(ride.scheduledFor)
+                                .toISOString()
+                                .split("T")[1]
+                                .split(".")[0]
+                        }
                     </div>
                 </CardDescription>
             </CardHeader>
@@ -262,7 +261,7 @@ export default function CreatedRides() {
                 </div>
                 <div className="flex justify-between mt-4">
                     {ride.status === "SCHEDULED" && (
-                        <div className="flex gap-2 w-auto">
+                        <div className="flex gap-4 w-auto">
                             <Button
                                 variant="outline"
                                 onClick={() => handleEditRide(ride)}
@@ -313,11 +312,23 @@ export default function CreatedRides() {
                             </AlertDialog>
                         </div>
                     )}
-                    {ride.status !== "SCHEDULED" && (
-                        <Button variant="secondary" className="w-full">
-                            View Details
-                        </Button>
+                    {ride.status === "ENROUTE" && (
+                        <div className="flex gap-4 w-auto">
+                            <Button
+                                onClick={() => handleEndRide(ride.id)}
+                                className="flex-1 bg-green-500 hover:bg-green-600"
+                            >
+                                <PlayCircle className="mr-2 h-4 w-4" />
+                                End Ride
+                            </Button>
+                        </div>
                     )}
+                    {ride.status !== "SCHEDULED" &&
+                        ride.status !== "ENROUTE" && (
+                            <Button variant="secondary" className="w-full">
+                                View Details
+                            </Button>
+                        )}
                 </div>
             </CardContent>
         </Card>
@@ -341,15 +352,25 @@ export default function CreatedRides() {
                     </div>
                 </CardHeader>
                 <CardContent>
-                    {scheduledRides.length === 0 ? (
+                    {createdRides.filter(
+                        (ride) =>
+                            ride.status === "SCHEDULED" ||
+                            ride.status === "ENROUTE"
+                    ).length === 0 ? (
                         <div className="text-center py-8 text-muted-foreground">
                             No scheduled rides at the moment
                         </div>
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2">
-                            {createdRides.map((ride) => (
-                                <RideCard key={ride.id} ride={ride} />
-                            ))}
+                            {createdRides
+                                .filter(
+                                    (ride) =>
+                                        ride.status === "SCHEDULED" ||
+                                        ride.status === "ENROUTE"
+                                )
+                                .map((ride) => (
+                                    <RideCard key={ride.id} ride={ride} />
+                                ))}
                         </div>
                     )}
                 </CardContent>
@@ -363,15 +384,25 @@ export default function CreatedRides() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {otherRides.length === 0 ? (
+                    {createdRides.filter(
+                        (ride) =>
+                            ride.status === "CANCELLED" ||
+                            ride.status === "COMPLETED"
+                    ).length === 0 ? (
                         <div className="text-center py-8 text-muted-foreground">
                             No other rides to display
                         </div>
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2">
-                            {otherRides.map((ride) => (
-                                <RideCard key={ride.id} ride={ride} />
-                            ))}
+                            {createdRides
+                                .filter(
+                                    (ride) =>
+                                        ride.status === "CANCELLED" ||
+                                        ride.status === "COMPLETED"
+                                )
+                                .map((ride) => (
+                                    <RideCard key={ride.id} ride={ride} />
+                                ))}
                         </div>
                     )}
                 </CardContent>
