@@ -109,24 +109,30 @@ export default function CreatedRides() {
         vehicleID: "",
     });
 
-    const {toast} = useToast()
+    const { toast } = useToast();
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
 
     useEffect(() => {
+        const fetchRides = async () => {
+            const response = await axios.get("/api/get-rides");
+            console.log(response);
+            setCreatedRides(response.data.data);
+        };
         const fetchVehicles = async () => {
             const response = await axios.get("/api/get-vehicles");
             setVehicles(response.data.data);
             console.log(response.data);
         };
+        fetchRides();
         fetchVehicles();
     }, []);
 
     const scheduledRides = createdRides.filter(
-        (ride) => ride.status === "Scheduled"
+        (ride) => ride.status === "SCHEDULED"
     );
     const otherRides = createdRides.filter(
-        (ride) => ride.status !== "Scheduled"
+        (ride) => ride.status !== "SCHEDULED"
     );
 
     const handleCreateRide = async () => {
@@ -134,12 +140,11 @@ export default function CreatedRides() {
         const optimisticRides = [...createdRides, newRide];
         setCreatedRides(optimisticRides);
         setIsCreateDialogOpen(false);
-    
+
         try {
             const response = await axios.post("/api/create-ride", newRide);
-            console.log(response)
+            console.log(response);
             setCreatedRides([...createdRides, response.data.data]);
-            
         } catch (error) {
             // Revert optimistic update in case of error
             setCreatedRides(createdRides);
@@ -159,7 +164,7 @@ export default function CreatedRides() {
             });
         }
     };
-    
+
     const [cars, setCars] = useState([]);
 
     const handleEditRide = (ride) => {
@@ -213,9 +218,9 @@ export default function CreatedRides() {
             <CardHeader>
                 <CardTitle className="flex justify-between items-center">
                     <span>
-                        {ride.from} to {ride.to}
+                        {ride.route.from} to {ride.route.to}
                     </span>
-                    <Badge className={getStatusColor("completed")}>
+                    <Badge className={getStatusColor("scheduled")}>
                         {ride.status}
                     </Badge>
                 </CardTitle>
@@ -341,7 +346,7 @@ export default function CreatedRides() {
                         </div>
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2">
-                            {scheduledRides.map((ride) => (
+                            {createdRides.map((ride) => (
                                 <RideCard key={ride.id} ride={ride} />
                             ))}
                         </div>
