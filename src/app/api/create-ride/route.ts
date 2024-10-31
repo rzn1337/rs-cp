@@ -9,13 +9,21 @@ export async function POST(request: NextRequest) {
 
         const driverID = (await getTokenData(request)) as string;
 
+        console.log(from, to, vehicleID, fare, scheduledFor, date, driverID);
+
+        const dateString = "2024-10-01";
+        const timeString = "15:56";
+
+        const isoDateTimeString = `${dateString}T${timeString}:00.000Z`;
+
+        const dateISO = new Date(isoDateTimeString);
+
         const ride = await prisma.ride.create({
             data: {
                 driverID,
                 vehicleID,
                 fare: parseFloat(fare),
-                scheduledFor,
-                date,
+                scheduledFor: dateISO,
                 route: {
                     create: {
                         from,
@@ -27,6 +35,8 @@ export async function POST(request: NextRequest) {
                 route: true, // Include route data if you want it in the response
             },
         });
+
+        console.log("ride", ride);
 
         if (!ride) {
             return NextResponse.json(
@@ -40,13 +50,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const response = NextResponse.json({
-            message: "Ride created successfully",
-            data: ride,
-            success: true,
-        });
-
-        return response;
+        return NextResponse.json(
+            {
+                message: "Ride created successfully",
+                data: ride,
+                success: false,
+            },
+            {
+                status: 200,
+            }
+        );
     } catch (error) {
         return Response.json({ error: error.message }, { status: 500 });
     }

@@ -46,6 +46,7 @@ import {
     PlayCircle,
 } from "lucide-react";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 const initialCreatedRides = [
     {
@@ -95,7 +96,7 @@ interface Vehicle {
 }
 
 export default function CreatedRides() {
-    const [createdRides, setCreatedRides] = useState(initialCreatedRides);
+    const [createdRides, setCreatedRides] = useState([]);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [editingRide, setEditingRide] = useState(null);
@@ -103,13 +104,14 @@ export default function CreatedRides() {
         from: "",
         to: "",
         date: "",
-        time: "",
-        price: "",
-        status: "Scheduled",
-        vehicle: "",
+        scheduledFor: "",
+        fare: "",
+        vehicleID: "",
     });
 
-    const [vehicles, setVehicles] = useState<Vehicle []>([]);
+    const {toast} = useToast()
+
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
 
     useEffect(() => {
         const fetchVehicles = async () => {
@@ -119,7 +121,6 @@ export default function CreatedRides() {
         };
         fetchVehicles();
     }, []);
-    
 
     const scheduledRides = createdRides.filter(
         (ride) => ride.status === "Scheduled"
@@ -128,26 +129,37 @@ export default function CreatedRides() {
         (ride) => ride.status !== "Scheduled"
     );
 
-    const handleCreateRide = () => {
-        const createdRide = {
-            ...newRide,
-            id: createdRides.length + 1,
-            passengers: [],
-        };
-        setCreatedRides([...createdRides, createdRide]);
+    const handleCreateRide = async () => {
+        // Optimistic UI update
+        const optimisticRides = [...createdRides, newRide];
+        setCreatedRides(optimisticRides);
         setIsCreateDialogOpen(false);
-        setNewRide({
-            from: "",
-            to: "",
-            date: "",
-            time: "",
-            price: "",
-            status: "Scheduled",
-            vehicle: "",
-        });
-        debugger
+    
+        try {
+            const response = await axios.post("/api/create-ride", newRide);
+            console.log(response)
+            setCreatedRides([...createdRides, response.data.data]);
+            
+        } catch (error) {
+            // Revert optimistic update in case of error
+            setCreatedRides(createdRides);
+            console.log(error);
+            toast({
+                title: "Error creating ride",
+                description: error.message,
+            });
+        } finally {
+            setNewRide({
+                from: "",
+                to: "",
+                date: "",
+                scheduledFor: "",
+                fare: "",
+                vehicleID: "",
+            });
+        }
     };
-
+    
     const [cars, setCars] = useState([]);
 
     const handleEditRide = (ride) => {
@@ -203,7 +215,7 @@ export default function CreatedRides() {
                     <span>
                         {ride.from} to {ride.to}
                     </span>
-                    <Badge className={getStatusColor(ride.status)}>
+                    <Badge className={getStatusColor("completed")}>
                         {ride.status}
                     </Badge>
                 </CardTitle>
@@ -224,12 +236,12 @@ export default function CreatedRides() {
                             {ride.from} → {ride.to}
                         </span>
                     </div>
-                    <p className="text-lg font-semibold">{ride.price}</p>
+                    <p className="text-lg font-semibold">{ride.fare}</p>
                 </div>
                 <div>
                     <h4 className="font-semibold mb-2">Passengers:</h4>
                     <div className="flex flex-wrap gap-2">
-                        {ride.passengers.map((passenger) => (
+                        {/* {ride.passengers.map((passenger) => (
                             <Avatar key={passenger.id} className="h-8 w-8">
                                 <AvatarImage
                                     src={`https://api.dicebear.com/6.x/initials/svg?seed=${passenger.name}`}
@@ -239,7 +251,7 @@ export default function CreatedRides() {
                                     {passenger.avatar}
                                 </AvatarFallback>
                             </Avatar>
-                        ))}
+                        ))} */}
                     </div>
                 </div>
                 <div className="flex justify-between mt-4">
@@ -425,29 +437,29 @@ export default function CreatedRides() {
                                 Time
                             </Label>
                             <Input
-                                id="time"
+                                id="scheduledFor"
                                 type="time"
-                                value={newRide.time}
+                                value={newRide.scheduledFor}
                                 onChange={(e) =>
                                     setNewRide({
                                         ...newRide,
-                                        time: e.target.value,
+                                        scheduledFor: e.target.value,
                                     })
                                 }
                                 className="col-span-3"
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="price" className="text-right">
-                                Price
+                            <Label htmlFor="fare" className="text-right">
+                                Fare
                             </Label>
                             <Input
-                                id="price"
-                                value={newRide.price}
+                                id="fare"
+                                value={newRide.fare}
                                 onChange={(e) =>
                                     setNewRide({
                                         ...newRide,
-                                        price: e.target.value,
+                                        fare: e.target.value,
                                     })
                                 }
                                 className="col-span-3"
@@ -458,9 +470,9 @@ export default function CreatedRides() {
                                 Vehicle
                             </Label>
                             <Select
-                                value={newRide.vehicleId}
+                                value={newRide.vehicleID}
                                 onValueChange={(value) =>
-                                    setNewRide({ ...newRide, vehicleId: value })
+                                    setNewRide({ ...newRide, vehicleID: value })
                                 }
                             >
                                 <SelectTrigger className="col-span-3">
