@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { MapPin, Search, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
 
 // Dummy data for rides
 const initialRides = [
@@ -116,6 +117,14 @@ export default function Dashboard() {
             description: `You've successfully booked a ride with ${selectedRide?.driver} from ${selectedRide?.from} to ${selectedRide.to}.`,
         });
     };
+
+    useEffect(() => {
+        const fetchAvailables = async () => {
+            const response = await axios.get(`/api/get-public-rides?search=${searchTerm}&limit=10`)
+            console.log(response);
+        }
+        fetchAvailables()
+    }, [searchTerm]);
 
     return (
         <div className="container mx-auto p-4">
