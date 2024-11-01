@@ -140,24 +140,33 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SignUp() {
     const [signupData, setSignupData] = useState({
-        name: "",
+        username: "",
         email: "",
         password: "",
         confirmPassword: "",
     });
+
+    const router = useRouter();
+
+    const { toast } = useToast();
 
     const handleSignupChange = (e) => {
         const { name, value } = e.target;
         setSignupData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSignup = (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault();
-        // Here you would typically send the signup data to your backend
-        console.log("Signup data:", signupData);
+        const response = await axios.post("/api/sign-up", signupData);
+        console.log(response);
+        if (response.status === 200) router.replace("/sign-in");
+        else toast({ title: "Failed to sign you up", variant: "destructive" });
     };
 
     return (
@@ -174,10 +183,10 @@ export default function SignUp() {
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="name">Name</Label>
                                     <Input
-                                        id="name"
-                                        name="name"
-                                        placeholder="Your name"
-                                        value={signupData.name}
+                                        id="username"
+                                        name="username"
+                                        placeholder="Your username"
+                                        value={signupData.username}
                                         onChange={handleSignupChange}
                                         required
                                     />

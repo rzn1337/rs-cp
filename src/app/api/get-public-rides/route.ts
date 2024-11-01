@@ -5,10 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
     try {
         const params = request.nextUrl.searchParams;
-        const searchTerm = params.get("search");
-        const limit = params.get("limit");
+        const searchTerm = params.get("search")!;
+        const limit = params.get("limit")!;
 
-        // console.log(searchTerm, limit);
+        const userID = (await getTokenData(request)) as string;
 
         const where = searchTerm
             ? {
@@ -18,11 +18,13 @@ export async function GET(request: NextRequest) {
                   ],
                   ride: {
                       status: "SCHEDULED",
+                      driverID: { not: userID },
                   },
               }
             : {
                   ride: {
                       status: "SCHEDULED",
+                      driverID: { not: userID },
                   },
               };
 
