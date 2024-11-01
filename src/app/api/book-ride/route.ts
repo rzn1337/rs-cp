@@ -7,6 +7,8 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { rideID } = body;
 
+        console.log("rideID", rideID)
+
         const userID = (await getTokenData(request)) as string;
 
         const existingBooking = await prisma.passengerOnRide.findUnique({

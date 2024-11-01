@@ -32,19 +32,27 @@ export default function Dashboard() {
         setIsDialogOpen(true);
     };
 
-    const confirmBooking = () => {
-        setRides(
-            rides.map((ride) =>
-                ride.id === selectedRide.id
-                    ? { ...ride, status: "Booked" }
-                    : ride
-            )
-        );
-        setIsDialogOpen(false);
-        toast({
-            title: "Ride Booked!",
-            description: `You've successfully booked a ride with ${selectedRide?.driver} from ${selectedRide?.from} to ${selectedRide.to}.`,
+    const confirmBooking = async () => {
+        console.log(selectedRide.rideID);
+        const response = await axios.post("/api/book-ride", {
+            rideID: selectedRide.ride.id,
         });
+        console.log(response);        
+        if (response.statusCode === 200) {
+            setRides((rides) =>
+                rides.filter((ride) => ride.ride.id !== selectedRide.ride.id)
+            );
+            toast({
+                title: "Ride Booked!",
+                description: `You've successfully booked a ride with ${selectedRide?.ride.driver} from ${selectedRide?.from} to ${selectedRide.to}.`,
+            });
+        } else {
+            toast({
+                title: "Couldn't book your ride",
+                description: "Please try again",
+            });
+        }
+        setIsDialogOpen(false);
     };
 
     useEffect(() => {
