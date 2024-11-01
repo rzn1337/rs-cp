@@ -14,20 +14,21 @@ datasource db {
 }
 
 model User {
-  id                      String      @id @default(cuid())
-  email                   String      @unique
-  username                String      @unique
+  id                      String            @id @default(cuid())
+  email                   String            @unique
+  username                String            @unique
   password                String
   name                    String?
-  role                    Role        @default(USER)
-  status                  UserStatus  @default(PASSENGER)
+  role                    Role              @default(USER)
+  status                  UserStatus        @default(PASSENGER)
   profileImage            String?
-  createdAt               DateTime    @default(now())
-  updatedAt               DateTime    @updatedAt
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
   Vehicle                 Vehicle[]
-  Ride                    Ride[]
-  complaintsAsComplainee  Complaint[] @relation("ComplaineeComplaints")
-  complaintsAsComplainant Complaint[] @relation("ComplainantComplaints")
+  Rixde                   Ride[]
+  complaintsAsComplainee  Complaint[]       @relation("ComplaineeComplaints")
+  complaintsAsComplainant Complaint[]       @relation("ComplainantComplaints")
+  bookedRides             PassengerOnRide[]
 
   @@map("users") // follow naming conventions for relational dbs, nothing important
 }
@@ -58,19 +59,32 @@ model Vehicle {
 }
 
 model Ride {
-  id           String      @id @default(cuid())
+  id           String            @id @default(cuid())
   driverID     String
-  driver       User        @relation(fields: [driverID], references: [id])
+  driver       User              @relation(fields: [driverID], references: [id])
   vehicleID    String
-  vehicle      Vehicle     @relation(fields: [vehicleID], references: [id])
+  vehicle      Vehicle           @relation(fields: [vehicleID], references: [id])
   fare         Float
-  createdAt    DateTime    @default(now())
-  status       RideStatus  @default(SCHEDULED)
+  createdAt    DateTime          @default(now())
+  status       RideStatus        @default(SCHEDULED)
   scheduledFor DateTime
   route        Route?
   Complaint    Complaint[]
+  passengers   PassengerOnRide[]
 
   @@map("rides")
+}
+
+model PassengerOnRide {
+  id       String   @id @default(cuid())
+  userID   String
+  user     User     @relation(fields: [userID], references: [id])
+  rideID   String
+  ride     Ride     @relation(fields: [rideID], references: [id])
+  bookedAt DateTime @default(now())
+
+  @@unique([userID, rideID], name: "userID_rideID")
+  @@map("passengers_on_rides")
 }
 
 enum RideStatus {
