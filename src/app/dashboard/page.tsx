@@ -81,16 +81,8 @@ export default function Dashboard() {
                                     <span>
                                         {ride.from} to {ride.to}
                                     </span>
-                                    <Badge
-                                        variant={
-                                            ride.ride.status === "SCHEDULED"
-                                                ? "default"
-                                                : ride.ride.status === "ENROUTE"
-                                                ? "secondary"
-                                                : "outline"
-                                        }
-                                    >
-                                        {ride.ride.status}
+                                    <Badge className="bg-green-500">
+                                        {"AVAILABLE"}
                                     </Badge>
                                 </CardTitle>
                             </CardHeader>
@@ -110,12 +102,18 @@ export default function Dashboard() {
                                             {ride.ride.driverID}
                                         </p>
                                         <p className="text-sm text-muted-foreground">
-                                            {new Date(ride.ride.scheduledFor)
-                                .toISOString()
-                                .split("T")[0]} at {new Date(ride.ride.scheduledFor)
-                                    .toISOString()
-                                    .split("T")[1]
-                                    .split(".")[0]}
+                                            {
+                                                new Date(ride.ride.scheduledFor)
+                                                    .toISOString()
+                                                    .split("T")[0]
+                                            }{" "}
+                                            at{" "}
+                                            {
+                                                new Date(ride.ride.scheduledFor)
+                                                    .toISOString()
+                                                    .split("T")[1]
+                                                    .split(".")[0]
+                                            }
                                         </p>
                                     </div>
                                 </div>
@@ -165,7 +163,8 @@ export default function Dashboard() {
                     {selectedRide && (
                         <div className="py-4">
                             <p>
-                                <strong>Driver:</strong> {selectedRide.ride.driverID}
+                                <strong>Driver:</strong>{" "}
+                                {selectedRide.ride.driverID}
                             </p>
                             <p>
                                 <strong>From:</strong> {selectedRide.from}
@@ -174,16 +173,29 @@ export default function Dashboard() {
                                 <strong>To:</strong> {selectedRide.to}
                             </p>
                             <p>
-                                <strong>Vehicle:</strong> {selectedRide.vehicle}
+                                <strong>Vehicle:</strong>{" "}
+                                {selectedRide.ride.vehicleID}
                             </p>
                             <p>
-                                <strong>Date:</strong> {selectedRide.date}
+                                <strong>Date:</strong>{" "}
+                                {
+                                    new Date(selectedRide.ride.scheduledFor)
+                                        .toISOString()
+                                        .split("T")[0]
+                                }
                             </p>
                             <p>
-                                <strong>Time:</strong> {selectedRide.time}
+                                <strong>Time:</strong>{" "}
+                                {
+                                    new Date(selectedRide.ride.scheduledFor)
+                                        .toISOString()
+                                        .split("T")[1]
+                                        .split(".")[0]
+                                }
                             </p>
                             <p>
-                                <strong>Price:</strong> {selectedRide.price}
+                                <strong>Price:</strong> $
+                                {selectedRide.ride.fare}
                             </p>
                         </div>
                     )}
