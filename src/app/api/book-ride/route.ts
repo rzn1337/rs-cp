@@ -15,6 +15,9 @@ export async function POST(request: NextRequest) {
             where: {
                 userID_rideID: { userID, rideID },
             },
+            include: {
+                ride: true,
+            },
         });
 
         if (existingBooking) {
@@ -41,11 +44,14 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const response = NextResponse.json({
-            message: "Ride booked successfully",
-            data: booking,
-            success: true,
-        });
+        const response = NextResponse.json(
+            {
+                message: "Ride booked successfully",
+                data: booking,
+                success: true,
+            },
+            { status: 200 }
+        );
 
         return response;
     } catch (error) {

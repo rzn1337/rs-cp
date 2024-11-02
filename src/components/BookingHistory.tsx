@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -65,6 +65,7 @@ import {
     PlusIcon,
     AlertTriangle,
 } from "lucide-react";
+import axios from "axios";
 
 // Dummy data for ride history
 const rideHistory = [
@@ -192,6 +193,7 @@ const BookingHistory = () => {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+    const [bookedRides, setBookedRides] = useState([]);
     const [newRide, setNewRide] = useState({
         from: "",
         to: "",
@@ -201,6 +203,15 @@ const BookingHistory = () => {
         status: "Scheduled",
         vehicle: "",
     });
+
+    useEffect(() => {
+        const fetchBookedRides = async () => {
+            const response = await axios.get("/api/get-bookings");
+            console.log(response);
+            setBookedRides(response.data.data);
+        };
+        fetchBookedRides();
+    }, []);
 
     const handleCreateRide = () => {
         const createdRide = {
@@ -341,25 +352,33 @@ const BookingHistory = () => {
                                     <TableHead>From</TableHead>
                                     <TableHead>To</TableHead>
                                     <TableHead>Date</TableHead>
-                                    <TableHead>Price</TableHead>
+                                    <TableHead>Fare</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {rideHistory.map((ride) => (
-                                    <TableRow key={ride.id}>
-                                        <TableCell>{ride.from}</TableCell>
-                                        <TableCell>{ride.to}</TableCell>
-                                        <TableCell>{ride.date}</TableCell>
-                                        <TableCell>{ride.price}</TableCell>
+                                {bookedRides.map((booking) => (
+                                    <TableRow key={booking.id}>
+                                        <TableCell>
+                                            {booking.ride.route.from}
+                                        </TableCell>
+                                        <TableCell>
+                                            {booking.ride.route.to}
+                                        </TableCell>
+                                        <TableCell>
+                                            {booking.bookedAt.split("T")[0]}
+                                        </TableCell>
+                                        <TableCell>
+                                            {booking.ride.fare}
+                                        </TableCell>
                                         <TableCell>
                                             <Badge
                                                 className={getStatusColor(
-                                                    ride.status
+                                                    booking.ride.status
                                                 )}
                                             >
-                                                {ride.status}
+                                                {booking.ride.status}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
@@ -375,7 +394,7 @@ const BookingHistory = () => {
                                                 <AlertCircle className="mr-2 h-4 w-4" />
                                                 Complain
                                             </Button> */}
-                                            {ride.status === "Scheduled" ? (
+                                            {booking.ride.status === "SCHEDULED" ? (
                                                 <Button
                                                     variant="destructive"
                                                     size="sm"

@@ -38,7 +38,7 @@ export default function Dashboard() {
             rideID: selectedRide.ride.id,
         });
         console.log(response);        
-        if (response.statusCode === 200) {
+        if (response.status === 200) {
             setRides((rides) =>
                 rides.filter((ride) => ride.ride.id !== selectedRide.ride.id)
             );
