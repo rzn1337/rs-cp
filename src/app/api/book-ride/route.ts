@@ -7,11 +7,11 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { rideID } = body;
 
-        console.log("rideID", rideID)
+        console.log("rideID", rideID);
 
         const userID = (await getTokenData(request)) as string;
 
-        const existingBooking = await prisma.passengerOnRide.findUnique({
+        const existingBooking = await prisma.booking.findUnique({
             where: {
                 userID_rideID: { userID, rideID },
             },
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const booking = await prisma.passengerOnRide.create({
+        const booking = await prisma.booking.create({
             data: { rideID, userID },
         });
 

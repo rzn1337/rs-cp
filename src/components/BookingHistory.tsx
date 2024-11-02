@@ -63,6 +63,7 @@ import {
     AlertCircle,
     Star,
     PlusIcon,
+    AlertTriangle,
 } from "lucide-react";
 
 // Dummy data for ride history
@@ -104,7 +105,7 @@ const rideHistory = [
         date: "2023-06-18",
         time: "13:45",
         price: "$15",
-        status: "Completed",
+        status: "Scheduled",
         driver: "Sarah Brown",
     },
 ];
@@ -151,6 +152,20 @@ const initialCreatedRides = [
             { id: 2, name: "Bob Smith", avatar: "BS" },
         ],
     },
+    {
+        id: 4,
+        from: "City ",
+        to: "Beach",
+        date: "2023-07-21",
+        time: "14:30",
+        price: "$202",
+        status: "Scheduled",
+        passengers: [
+            { id: 3, name: "Charlie Brown", avatar: "CB" },
+            { id: 4, name: "Diana Prince", avatar: "DP" },
+            { id: 5, name: "Ethan Hunt", avatar: "EH" },
+        ],
+    },
 ];
 
 // Dummy data for complaints
@@ -172,16 +187,11 @@ const initialComplaints = [
 ];
 
 const BookingHistory = () => {
-    const userCars = [
-        { id: "1", name: "Toyota Corolla" },
-        { id: "2", name: "Honda Civic" },
-        { id: "3", name: "Ford Mustang" },
-    ];
-    // const [createdRides, setCreatedRides] = useState([]);
     const [createdRides, setCreatedRides] = useState(initialCreatedRides);
     const [editingRide, setEditingRide] = useState(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
     const [newRide, setNewRide] = useState({
         from: "",
         to: "",
@@ -209,6 +219,22 @@ const BookingHistory = () => {
             status: "Scheduled",
             passengers: [],
         });
+    };
+
+    const handleOpenCancelDialog = (ride) => {
+        setSelectedRide(ride);
+        setIsCancelDialogOpen(true);
+    };
+
+    const handleCancelRide = () => {
+        setRideHistory(
+            rideHistory.map((ride) =>
+                ride.id === selectedRide.id
+                    ? { ...ride, status: "cancelled" }
+                    : ride
+            )
+        );
+        setIsCancelDialogOpen(false);
     };
 
     const ride = {
@@ -283,8 +309,6 @@ const BookingHistory = () => {
         setIsComplaintDialogOpen(true);
     };
 
-    const handleCancelRide = () => {};
-
     const handleCarSelect = () => {};
 
     const handleSubmitComplaint = () => {
@@ -339,7 +363,7 @@ const BookingHistory = () => {
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <Button
+                                            {/* <Button
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() =>
@@ -350,7 +374,34 @@ const BookingHistory = () => {
                                             >
                                                 <AlertCircle className="mr-2 h-4 w-4" />
                                                 Complain
-                                            </Button>
+                                            </Button> */}
+                                            {ride.status === "Scheduled" ? (
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        handleOpenCancelDialog(
+                                                            ride
+                                                        )
+                                                    }
+                                                >
+                                                    <AlertTriangle className="mr-2 h-4 w-4" />
+                                                    Cancel
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        handleOpenComplaintDialog(
+                                                            ride
+                                                        )
+                                                    }
+                                                >
+                                                    <AlertCircle className="mr-2 h-4 w-4" />
+                                                    Complain
+                                                </Button>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -423,6 +474,30 @@ const BookingHistory = () => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            <AlertDialog
+                open={isCancelDialogOpen}
+                onOpenChange={setIsCancelDialogOpen}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you sure you want to cancel this ride?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. You may be charged a
+                            cancellation fee.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>
+                            No, keep my booking
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={handleCancelRide}>
+                            Yes, cancel the ride
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 };
