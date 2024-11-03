@@ -66,6 +66,7 @@ import {
     AlertTriangle,
 } from "lucide-react";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 // Dummy data for ride history
 const rideHistory = [
@@ -188,6 +189,7 @@ const initialComplaints = [
 ];
 
 const BookingHistory = () => {
+    const { toast } = useToast();
     const [createdRides, setCreatedRides] = useState(initialCreatedRides);
     const [editingRide, setEditingRide] = useState(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -232,20 +234,31 @@ const BookingHistory = () => {
         });
     };
 
-    const handleOpenCancelDialog = (ride) => {
-        setSelectedRide(ride);
+    const handleOpenCancelDialog = (booking) => {
+        setSelectedBooking(booking);
+        console.log(booking);
         setIsCancelDialogOpen(true);
     };
 
-    const handleCancelRide = () => {
-        setRideHistory(
-            rideHistory.map((ride) =>
-                ride.id === selectedRide.id
-                    ? { ...ride, status: "cancelled" }
-                    : ride
-            )
-        );
-        setIsCancelDialogOpen(false);
+    const handleCancelRide = async () => {
+        console.log(selectedBooking);
+
+        try {
+            const response = await axios.post("/api/cancel-booking", {
+                rideID: selectedBooking!.ride.id,
+            });
+            toast({ title: "Booking cancelled successfully" });
+            setBookedRides((bookedRides) =>
+                bookedRides.filter(
+                    (bookedRide) => bookedRide.id !== selectedBooking!.id
+                )
+            );
+            setSelectedBooking(null);
+        } catch (error) {
+            toast({ title: "Failed to cancel your booking. Please try again" });
+        } finally {
+            setIsCancelDialogOpen(false);
+        }
     };
 
     const ride = {
@@ -294,7 +307,7 @@ const BookingHistory = () => {
         console.log("Edit ride:", ride);
     };
 
-    const [selectedRide, setSelectedRide] = useState(null);
+    const [selectedBooking, setSelectedBooking] = useState(null);
     const [complaintType, setComplaintType] = useState("");
     const [complaintDescription, setComplaintDescription] = useState("");
     const [isComplaintDialogOpen, setIsComplaintDialogOpen] = useState(false);
@@ -394,13 +407,14 @@ const BookingHistory = () => {
                                                 <AlertCircle className="mr-2 h-4 w-4" />
                                                 Complain
                                             </Button> */}
-                                            {booking.ride.status === "SCHEDULED" ? (
+                                            {booking.ride.status ===
+                                            "SCHEDULED" ? (
                                                 <Button
                                                     variant="destructive"
                                                     size="sm"
                                                     onClick={() =>
                                                         handleOpenCancelDialog(
-                                                            ride
+                                                            booking
                                                         )
                                                     }
                                                 >
@@ -413,7 +427,7 @@ const BookingHistory = () => {
                                                     size="sm"
                                                     onClick={() =>
                                                         handleOpenComplaintDialog(
-                                                            ride
+                                                            booking
                                                         )
                                                     }
                                                 >
