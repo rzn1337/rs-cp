@@ -19,12 +19,22 @@ export async function GET(request: NextRequest) {
                   ride: {
                       status: "SCHEDULED",
                       driverID: { not: userID },
+                      passengers: {
+                          none: {
+                              userID: userID, // Exclude rides the user has already booked
+                          },
+                      },
                   },
               }
             : {
                   ride: {
                       status: "SCHEDULED",
                       driverID: { not: userID },
+                      passengers: {
+                          none: {
+                              userID: userID, // Exclude rides the user has already booked
+                          },
+                      },
                   },
               };
 
