@@ -42,7 +42,13 @@ export async function GET(request: NextRequest) {
             where,
             take: parseInt(limit, 10),
             include: {
-                ride: true,
+                ride: {
+                    include: {
+                        driver: true,
+                        vehicle: true,
+                        passengers: true,
+                    },
+                },
             },
             orderBy: {
                 ride: {

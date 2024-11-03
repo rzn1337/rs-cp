@@ -15,7 +15,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { MapPin, Search, User } from "lucide-react";
+import { CarFront, MapPin, Search, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 
@@ -37,7 +37,7 @@ export default function Dashboard() {
         const response = await axios.post("/api/book-ride", {
             rideID: selectedRide.ride.id,
         });
-        console.log(response);        
+        console.log(response);
         if (response.status === 200) {
             setRides((rides) =>
                 rides.filter((ride) => ride.ride.id !== selectedRide.ride.id)
@@ -98,8 +98,8 @@ export default function Dashboard() {
                                 <div className="flex items-center mb-4">
                                     <Avatar className="h-9 w-9">
                                         <AvatarImage
-                                            src={`https://api.dicebear.com/9.x/notionists/svg?seed=${ride.driver}`}
-                                            alt={ride.driver}
+                                            src={`https://api.dicebear.com/9.x/notionists/svg?seed=${ride.ride.driver.username}`}
+                                            alt={ride.ride.driver.username}
                                         />
                                         <AvatarFallback>
                                             <User className="h-4 w-4" />
@@ -107,7 +107,7 @@ export default function Dashboard() {
                                     </Avatar>
                                     <div className="ml-3">
                                         <p className="text-sm font-medium">
-                                            {ride.ride.driverID}
+                                            {ride.ride.driver.username}
                                         </p>
                                         <p className="text-sm text-muted-foreground">
                                             {
@@ -126,12 +126,31 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <div className="flex items-center text-muted-foreground">
+                                    {/* <div className="flex gap-2 items-center text-muted-foreground">
                                         <MapPin className="h-4 w-4 mr-1" />
                                         <span className="text-sm">
                                             {ride.from} → {ride.to}
                                         </span>
+                                        <CarFront className="h-4 w-4 mr-1" />
+                                        <span className="text-sm">
+                                            {`${ride.ride.vehicle.make} ${ride.ride.vehicle.model}`}
+                                        </span>
+                                    </div> */}
+                                    <div className="flex flex-col gap-2 items-start text-muted-foreground">
+                                        <div className="flex items-center">
+                                            <MapPin className="h-4 w-4 mr-1" />
+                                            <span className="text-sm">
+                                                {ride.from} → {ride.to}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <CarFront className="h-4 w-4 mr-1" />
+                                            <span className="text-sm">
+                                                {`${ride.ride.vehicle.make} ${ride.ride.vehicle.model}`}
+                                            </span>
+                                        </div>
                                     </div>
+
                                     <p className="text-lg font-semibold">
                                         ${ride.ride.fare}
                                     </p>
