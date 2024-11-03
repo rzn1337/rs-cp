@@ -32,7 +32,19 @@ export async function POST(request: NextRequest) {
                 },
             },
             include: {
-                route: true, // Include route data if you want it in the response
+                route: true,
+                passengers: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                name: true,
+                                profileImage: true,
+                            },
+                        },
+                    },
+                },
             },
         });
 

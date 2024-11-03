@@ -94,10 +94,9 @@ export default function CreatedRides() {
 
     const handleCreateRide = async () => {
         // Optimistic UI update
-        // const optimisticRides = [...createdRides, newRide];
-        setCreatedRides((rides) => [...rides, newRide]);
+        const optimisticRides = [...createdRides, newRide];
+        setCreatedRides(optimisticRides);
         setIsCreateDialogOpen(false);
-
         try {
             const response = await axios.post("/api/create-ride", newRide);
             console.log(response);
@@ -249,7 +248,7 @@ export default function CreatedRides() {
                 <div>
                     <h4 className="font-semibold mb-2">Passengers:</h4>
                     <div className="flex flex-wrap gap-2">
-                        {ride.passengers.map((passenger) => (
+                        {ride.passengers?.length > 0 && ride.passengers.map((passenger) => (
                             <Avatar key={passenger.id} className="h-8 w-8">
                                 <AvatarImage
                                     src={`https://api.dicebear.com/9.x/notionists/svg?seed=${passenger.user.username}`}
