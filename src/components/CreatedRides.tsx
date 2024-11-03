@@ -89,7 +89,7 @@ export default function CreatedRides() {
             console.log(response.data);
         };
         fetchRides();
-        fetchVehicles();
+        fetchVehicles(); // TODO: get vehicles within the get-rides call
     }, []);
 
     const handleCreateRide = async () => {
@@ -153,7 +153,10 @@ export default function CreatedRides() {
         console.log(response);
 
         if (response.status === 200) {
-            toast({ title: "Your ride has been cancelled", variant: "destructive"});
+            toast({
+                title: "Your ride has been cancelled",
+                variant: "destructive",
+            });
         }
     };
 
@@ -246,17 +249,17 @@ export default function CreatedRides() {
                 <div>
                     <h4 className="font-semibold mb-2">Passengers:</h4>
                     <div className="flex flex-wrap gap-2">
-                        {/* {ride.passengers.map((passenger) => (
+                        {ride.passengers.map((passenger) => (
                             <Avatar key={passenger.id} className="h-8 w-8">
                                 <AvatarImage
-                                    src={`https://api.dicebear.com/6.x/initials/svg?seed=${passenger.name}`}
-                                    alt={passenger.name}
+                                    src={`https://api.dicebear.com/9.x/notionists/svg?seed=${passenger.user.username}`}
+                                    alt={passenger.username}
                                 />
                                 <AvatarFallback>
                                     {passenger.avatar}
                                 </AvatarFallback>
                             </Avatar>
-                        ))} */}
+                        ))}
                     </div>
                 </div>
                 <div className="flex justify-between mt-4">

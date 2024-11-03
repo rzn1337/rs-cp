@@ -10,6 +10,18 @@ export async function GET(request: NextRequest) {
             where: { driverID: userID },
             include: {
                 route: true,
+                passengers: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                name: true,
+                                profileImage: true,
+                            },
+                        },
+                    },
+                },
             },
         });
 
