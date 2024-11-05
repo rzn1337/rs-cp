@@ -225,8 +225,12 @@ const CreateRideTab = () => {
                                 </div>
                             </div>
                             <div>
-                                <Label htmlFor="vehicle">Vehicle</Label>
                                 <div className="relative">
+                                    <Label htmlFor="vehicle">Vehicle</Label>
+                                    <CarFront
+                                        className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                                        size={16}
+                                    />
                                     <Select
                                         value={newRide.vehicleID}
                                         onValueChange={(value) =>
@@ -252,10 +256,6 @@ const CreateRideTab = () => {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <CarFront
-                                        className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
-                                        size={16}
-                                    />
                                 </div>
                             </div>
                         </div>
