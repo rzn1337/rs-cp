@@ -31,127 +31,55 @@ import {
 import axios from "axios";
 
 import { cn } from "@/lib/utils";
-
-const PaymentIcons = {
-    
-    VISA: () => (
-        <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none">
-            <path
-                d="M2 9C2 7.89543 2.89543 7 4 7H20C21.1046 7 22 7.89543 22 9V15C22 16.1046 21.1046 17 20 17H4C2.89543 17 2 16.1046 2 15V9Z"
-                stroke="currentColor"
-                strokeWidth="2"
-            />
-            <path
-                d="M7 13L8.5 11L10 13"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-            <path
-                d="M12 13H14"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-            />
-            <path
-                d="M16 11H18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-            />
-        </svg>
-    ),
-    MASTERCARD: () => (
-        <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none">
-            <circle cx="9" cy="12" r="5" fill="#FF0000" fillOpacity="0.6" />
-            <circle cx="15" cy="12" r="5" fill="#FFBA08" fillOpacity="0.6" />
-        </svg>
-    ),
-    PAYPAL: () => (
-        <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none">
-            <path
-                d="M7 7H15C16.6569 7 18 8.34315 18 10C18 11.6569 16.6569 13 15 13H10L8 17H5L7 7Z"
-                stroke="currentColor"
-                strokeWidth="2"
-            />
-            <path
-                d="M10 13L9 17"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-            />
-        </svg>
-    ),
-    APPLE_PAY: () => (
-        <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none">
-            <path
-                d="M12 6C14.2091 6 16 7.79086 16 10V14C16 16.2091 14.2091 18 12 18C9.79086 18 8 16.2091 8 14V10C8 7.79086 9.79086 6 12 6Z"
-                stroke="currentColor"
-                strokeWidth="2"
-            />
-            <path
-                d="M12 6V18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-            />
-        </svg>
-    ),
-    GOOGLE_PAY: () => (
-        <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none">
-            <rect
-                x="4"
-                y="6"
-                width="16"
-                height="12"
-                rx="2"
-                stroke="currentColor"
-                strokeWidth="2"
-            />
-            <path
-                d="M8 12H16"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-            />
-        </svg>
-    ),
-};
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 const PAYMENT_METHODS = [
     {
-        id: 'visa',
-        name: 'Visa',
-        icon: '/visa.svg',
-        description: '**** **** **** 1234',
+        id: "visa",
+        name: "Visa",
+        icon: "/visa.svg",
+        description: "**** **** **** 1234",
     },
     {
-        id: 'mastercard',
-        name: 'Mastercard',
-        icon: '/mastercard.svg',
-        description: '**** **** **** 5678',
+        id: "mastercard",
+        name: "Mastercard",
+        icon: "/mastercard.svg",
+        description: "**** **** **** 5678",
     },
     {
-        id: 'paypal',
-        name: 'PayPal',
-        icon: '/paypal.svg',
-        description: 'john.doe@example.com',
+        id: "paypal",
+        name: "PayPal",
+        icon: "/paypal.svg",
+        description: "john.doe@example.com",
     },
     {
-        id: 'apple_pay',
-        name: 'Apple Pay',
-        icon: '/applepay.svg',
-        description: 'iPhone 14 Pro',
+        id: "apple_pay",
+        name: "Apple Pay",
+        icon: "/applepay.svg",
+        description: "iPhone 14 Pro",
     },
     {
-        id: 'google_pay',
-        name: 'Google Pay',
-        icon: '/gpay.svg',
-        description: 'Personal Account',
+        id: "google_pay",
+        name: "Google Pay",
+        icon: "/gpay.svg",
+        description: "Personal Account",
     },
 ];
 
+// Helper function to generate random ride data for the past year
+const generateRideData = () => {
+    const today = new Date()
+    const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate())
+    const data = {}
+    
+    for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
+      const key = d.toISOString().split('T')[0]
+      data[key] = Math.floor(Math.random() * 5) // 0 to 4 rides per day
+    }
+    
+    return data
+  }
+  
+  const rideData = generateRideData()
 
 export default function UserProfile() {
     const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
@@ -159,9 +87,9 @@ export default function UserProfile() {
     const [selectedPayments, setSelectedPayments] = useState([]);
 
     const handlePaymentMethodToggle = (paymentId) => {
-        setSelectedPayments(prev =>
+        setSelectedPayments((prev) =>
             prev.includes(paymentId)
-                ? prev.filter(id => id !== paymentId)
+                ? prev.filter((id) => id !== paymentId)
                 : [...prev, paymentId]
         );
     };
@@ -204,6 +132,40 @@ export default function UserProfile() {
         };
         fetchVehicles();
     }, []);
+    const [hoveredDay, setHoveredDay] = useState(null)
+
+  const getColor = (count) => {
+    if (count === 0) return 'bg-gray-100'
+    if (count === 1) return 'bg-green-200'
+    if (count === 2) return 'bg-green-300'
+    if (count === 3) return 'bg-green-400'
+    return 'bg-green-600'
+  }
+
+    const renderHeatmap = () => {
+        const cells = Object.entries(rideData).map(([date, count]) => (
+          <TooltipProvider key={date}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div
+                  className={`w-3 h-3 rounded-sm ${getColor(count)}`}
+                  onMouseEnter={() => setHoveredDay({ date, count })}
+                  onMouseLeave={() => setHoveredDay(null)}
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{date}: {count} ride{count !== 1 ? 's' : ''}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ))
+    
+        return (
+          <div className="grid grid-cols-[repeat(53,_1fr)] gap-1 mb-4">
+            {cells}
+          </div>
+        )
+      }
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -239,7 +201,7 @@ export default function UserProfile() {
                         Vehicle Info
                     </TabsTrigger>
                 </TabsList>
-                <TabsContent value="trip-history">
+                {/* <TabsContent value="trip-history">
                     <Card>
                         <CardHeader>
                             <CardTitle>Trip History</CardTitle>
@@ -248,6 +210,30 @@ export default function UserProfile() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
+                            <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
+                                <span className="text-gray-500">
+                                    Interactive Map View
+                                </span>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent> */}
+                <TabsContent value="trip-history">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Trip History</CardTitle>
+                            <CardDescription>
+                                View your past rides on the map and yearly
+                                overview
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="mb-6">
+                                <h3 className="text-sm font-medium mb-2">
+                                    Ride Frequency (Past Year)
+                                </h3>
+                                {renderHeatmap()}
+                            </div>
                             <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
                                 <span className="text-gray-500">
                                     Interactive Map View
@@ -266,38 +252,47 @@ export default function UserProfile() {
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {PAYMENT_METHODS.map((method) => (
-    <div
-        key={method.id}
-        onClick={() => handlePaymentMethodToggle(method.id)}
-        className={cn(
-            "p-4 rounded-lg border-2 cursor-pointer transition-all",
-            "hover:border-blue-500 hover:bg-blue-50",
-            selectedPayments.includes(method.id)
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-200"
-        )}
-    >
-        <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-                <img src={method.icon} alt={`${method.name} icon`} className="w-6 h-6" />
-                <div>
-                    <h3 className="font-medium">{method.name}</h3>
-                    <p className="text-sm text-gray-500">{method.description}</p>
-                </div>
-            </div>
-            {selectedPayments.includes(method.id) && (
-                <CheckCircle2 className="w-6 h-6 text-blue-500" />
-            )}
-        </div>
-    </div>
-))}
-
+                                {PAYMENT_METHODS.map((method) => (
+                                    <div
+                                        key={method.id}
+                                        onClick={() =>
+                                            handlePaymentMethodToggle(method.id)
+                                        }
+                                        className={cn(
+                                            "p-4 rounded-lg border-2 cursor-pointer transition-all",
+                                            "hover:border-blue-500 hover:bg-blue-50",
+                                            selectedPayments.includes(method.id)
+                                                ? "border-blue-500 bg-blue-50"
+                                                : "border-gray-200"
+                                        )}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-4">
+                                                <img
+                                                    src={method.icon}
+                                                    alt={`${method.name} icon`}
+                                                    className="w-6 h-6"
+                                                />
+                                                <div>
+                                                    <h3 className="font-medium">
+                                                        {method.name}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-500">
+                                                        {method.description}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {selectedPayments.includes(
+                                                method.id
+                                            ) && (
+                                                <CheckCircle2 className="w-6 h-6 text-blue-500" />
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                             <div className="mt-6 flex justify-end">
-                                <Button>
-                                    Save Payment Preferences
-                                </Button>
+                                <Button>Save Payment Preferences</Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -328,7 +323,10 @@ export default function UserProfile() {
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <p>Type: {vehicle.type.toLowerCase()}</p>
+                                            <p>
+                                                Type:{" "}
+                                                {vehicle.type.toLowerCase()}
+                                            </p>
                                             <p>Seats: {vehicle.seats}</p>
                                             <p>Model: {vehicle.year}</p>
                                             <p>
@@ -384,11 +382,19 @@ export default function UserProfile() {
                             </div>
                             <div>
                                 <Label htmlFor="make">Make</Label>
-                                <Input id="make" name="make" placeholder="Enter make" />
+                                <Input
+                                    id="make"
+                                    name="make"
+                                    placeholder="Enter make"
+                                />
                             </div>
                             <div>
                                 <Label htmlFor="model">Model</Label>
-                                <Input id="model" name="model" placeholder="Enter model" />
+                                <Input
+                                    id="model"
+                                    name="model"
+                                    placeholder="Enter model"
+                                />
                             </div>
                             <div>
                                 <Label htmlFor="seats">Seat Count</Label>
