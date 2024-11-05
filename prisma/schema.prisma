@@ -44,18 +44,26 @@ enum UserStatus {
 }
 
 model Vehicle {
-  id           String   @id @default(cuid())
+  id           String      @id @default(cuid())
   userID       String
-  user         User     @relation(fields: [userID], references: [id])
+  user         User        @relation(fields: [userID], references: [id])
   make         String
   model        String
   seats        Int
   year         Int
-  licensePlate String   @unique
-  createdAt    DateTime @default(now())
+  type         VehicleType @default(SEDAN)
+  licensePlate String      @unique
+  createdAt    DateTime    @default(now())
   Ride         Ride[]
 
   @@map("vehicles")
+}
+
+enum VehicleType {
+  SUV
+  VAN
+  SEDAN
+  COUPE
 }
 
 model Ride {

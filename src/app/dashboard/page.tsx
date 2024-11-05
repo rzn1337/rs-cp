@@ -365,7 +365,7 @@ export default function Dashboard() {
 
             <Card className="mb-8">
                 <CardHeader>
-                    <CardTitle>Filter Available Rides</CardTitle>
+                    <CardTitle className="">Filter Available Rides</CardTitle>
                     <CardDescription>
                         Customize your search for the perfect ride
                     </CardDescription>
