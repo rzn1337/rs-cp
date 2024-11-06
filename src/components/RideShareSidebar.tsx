@@ -215,6 +215,7 @@ export default function AppSidebar() {
     ];
 
     return (
+        <div className="flex h-screen">
         <Sidebar collapsible="icon">
             <SidebarHeader>
                 <SidebarMenu>
@@ -461,5 +462,6 @@ export default function AppSidebar() {
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>
+        </div>
     );
 }

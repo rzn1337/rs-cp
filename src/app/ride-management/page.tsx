@@ -113,7 +113,7 @@ export default function RideManagement() {
 
     return (
         <>
-            <div className="container mx-auto px-4 py-8min-h-screen">
+            <div className="container relative mx-auto px-4 py-8min-h-screen">
                 <h1 className="text-3xl font-bold text-gray-800 mb-8">
                     Ride Management
                 </h1>

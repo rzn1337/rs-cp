@@ -398,8 +398,6 @@ const users = [
 ];
 
 export default function AdminDashboard() {
-    
-    
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredUsers, setFilteredUsers] = useState(users);
 

@@ -33,7 +33,7 @@ export default function RootLayout({
             <body>
                 <SidebarProvider>
                     <AppSidebar />
-                    <main>
+                    <main className="flex-1 w-0 overflow-auto">
                         <SidebarTrigger />
                         {children}
                     </main>
