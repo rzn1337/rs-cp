@@ -53,6 +53,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "./ui/badge";
 
 const RideDashboard = () => {
     const [expandedPastRide, setExpandedPastRide] = useState<number | null>(
@@ -105,8 +106,6 @@ const RideDashboard = () => {
             earnings: 75,
         },
     ];
-
-    
 
     return (
         <TabsContent value="ride-dashboard" className="p-4">
@@ -196,7 +195,7 @@ const RideDashboard = () => {
                                             </div>
                                             <div className="flex items-center space-x-2">
                                                 <span className="font-semibold">
-                                                    ${ride.earnings}
+                                                    <Badge>CANCELLED</Badge>
                                                 </span>
                                                 {expandedPastRide ===
                                                 ride.id ? (
