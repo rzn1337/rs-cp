@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Calendar,
     Clock,
@@ -14,6 +14,9 @@ import {
     Star,
     UserMinus,
     MessageCircle,
+    Play,
+    Pause,
+    StopCircle,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -24,88 +27,138 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import RideManagementModal from "@/components/RideManagementModal";
 import ManageRideDialog from "@/components/ManageRideDialog";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
+import axios from "axios";
 
 const RideDashboard = () => {
     const [expandedPastRide, setExpandedPastRide] = useState<number | null>(
         null
     );
-    const upcomingRides = [
-        {
-            id: 1,
-            date: "2023-05-20",
-            time: "14:00",
-            pickup: "Central Park",
-            destination: "JFK Airport",
-            seatsBooked: 3,
-        },
-        {
-            id: 2,
-            date: "2023-05-22",
-            time: "09:30",
-            pickup: "Times Square",
-            destination: "Brooklyn Bridge",
-            seatsBooked: 2,
-        },
-        {
-            id: 3,
-            date: "2023-05-20",
-            time: "14:00",
-            pickup: "Central Park",
-            destination: "JFK Airport",
-            seatsBooked: 3,
-        },
-    ];
+    const [pastRides, setPastRides] = useState([]);
+    const [upcomingRides, setUpcomingRides] = useState([]);
+    const [activeRide, setActiveRide] = useState(null);
+    const [isRidePaused, setIsRidePaused] = useState(false);
+    const [rideTimer, setRideTimer] = useState(0);
 
-    const pastRides = [
-        {
-            id: 1,
-            date: "2023-05-15",
-            time: "11:00",
-            pickup: "Statue of Liberty",
-            destination: "Empire State Building",
-            seatsBooked: 4,
-            earnings: 120,
-        },
-        {
-            id: 2,
-            date: "2023-05-10",
-            time: "16:45",
-            pickup: "Broadway Theater",
-            destination: "Central Park",
-            seatsBooked: 2,
-            earnings: 75,
-        },
-    ];
+    useEffect(() => {
+        const fetchRides = async () => {
+            const response = await axios.get("/api/get-rides");
+            response.data.data.forEach((ride) => {
+                if (ride.status === "SCHEDULED") {
+                    setUpcomingRides((prev) => [...prev, ride]);
+                } else {
+                    setPastRides((prev) => [...prev, ride]);
+                }
+            });
+            console.log(response);
+        };
+        fetchRides();
+    }, [setUpcomingRides, setPastRides]);
+
+    useEffect(() => {
+        let intervalId: ReturnType<typeof setInterval> | null = null;
+
+        if (activeRide && !isRidePaused) {
+            intervalId = setInterval(() => {
+                setRideTimer((prevTimer) => prevTimer + 1);
+            }, 1000);
+        }
+
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [activeRide, isRidePaused]);
+
+    // const upcomingRides = [
+    //     {
+    //         id: 1,
+    //         date: "2023-05-20",
+    //         time: "14:00",
+    //         pickup: "Central Park",
+    //         destination: "JFK Airport",
+    //         seatsBooked: 3,
+    //     },
+    //     {
+    //         id: 2,
+    //         date: "2023-05-22",
+    //         time: "09:30",
+    //         pickup: "Times Square",
+    //         destination: "Brooklyn Bridge",
+    //         seatsBooked: 2,
+    //     },
+    //     {
+    //         id: 3,
+    //         date: "2023-05-20",
+    //         time: "14:00",
+    //         pickup: "Central Park",
+    //         destination: "JFK Airport",
+    //         seatsBooked: 3,
+    //     },
+    // ];
+
+    // const pastRides = [
+    //     {
+    //         id: 1,
+    //         date: "2023-05-15",
+    //         time: "11:00",
+    //         pickup: "Statue of Liberty",
+    //         destination: "Empire State Building",
+    //         seatsBooked: 4,
+    //         earnings: 120,
+    //     },
+    //     {
+    //         id: 2,
+    //         date: "2023-05-10",
+    //         time: "16:45",
+    //         pickup: "Broadway Theater",
+    //         destination: "Central Park",
+    //         seatsBooked: 2,
+    //         earnings: 75,
+    //     },
+    // ];
+
+    const startRide = (ride) => {
+        setActiveRide(ride);
+        setIsRidePaused(false);
+    };
+
+    const pauseRide = () => {
+        setIsRidePaused(true);
+    };
+
+    const resumeRide = () => {
+        setIsRidePaused(false);
+    };
+
+    const endRide = () => {
+        setActiveRide(null);
+        setIsRidePaused(false);
+    };
+
+    const formatRideTime = (seconds: number) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+            .toString()
+            .padStart(2, "0")}`;
+    };
+
+    const handleUpdateRide = async (updatedRide) => {
+        console.log(updatedRide);
+        try {
+            const response = await axios.patch(
+                "/api/update-ride-details",
+                updatedRide
+            );
+            console.log(response);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <TabsContent value="ride-dashboard" className="p-4">
@@ -123,34 +176,47 @@ const RideDashboard = () => {
                                 {upcomingRides.map((ride) => (
                                     <div
                                         key={ride.id}
-                                        className="bg-gray-50 p-4 rounded-lg shadow flex justify-between items-center"
+                                        className="p-4 rounded-lg shadow flex justify-between items-center"
                                     >
                                         <div>
                                             <p className="font-semibold">
-                                                {ride.date} at {ride.time}
+                                                {
+                                                    new Date(ride.scheduledFor)
+                                                        .toISOString()
+                                                        .split("T")[0]
+                                                }{" "}
+                                                at{" "}
+                                                {new Date(ride.scheduledFor)
+                                                    .toISOString()
+                                                    .slice(11, 16)}
                                             </p>
-                                            <p className="text-sm text-gray-600">
-                                                {ride.pickup} →{" "}
-                                                {ride.destination}
+                                            <p className="text-sm text-muted-foreground">
+                                                {ride.route.from} →{" "}
+                                                {ride.route.to}
                                             </p>
                                         </div>
                                         <div className="text-right">
                                             <p className="font-semibold">
-                                                {ride.seatsBooked} seats booked
+                                                {ride.passengers.length} seats
+                                                booked
                                             </p>
-                                            {/* <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="mt-2"
-                                                            onClick={() =>
-                                                                setSelectedRide(
-                                                                    ride
-                                                                )
-                                                            }
-                                                        >
-                                                            Manage
-                                                        </Button> */}
-                                            <ManageRideDialog />
+                                            <div className="flex space-x-2 mt-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        startRide(ride)
+                                                    }
+                                                >
+                                                    Start
+                                                </Button>
+                                                <ManageRideDialog
+                                                    currentRide={ride}
+                                                    handleUpdateRide={
+                                                        handleUpdateRide
+                                                    }
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -172,7 +238,7 @@ const RideDashboard = () => {
                                 {pastRides.map((ride) => (
                                     <div
                                         key={ride.id}
-                                        className="bg-gray-50 p-4 rounded-lg shadow"
+                                        className="p-4 rounded-lg shadow"
                                     >
                                         <div
                                             className="flex justify-between items-center cursor-pointer"
@@ -188,14 +254,14 @@ const RideDashboard = () => {
                                                 <p className="font-semibold">
                                                     {ride.date} at {ride.time}
                                                 </p>
-                                                <p className="text-sm text-gray-600">
+                                                <p className="text-sm text-muted-foreground">
                                                     {ride.pickup} →{" "}
                                                     {ride.destination}
                                                 </p>
                                             </div>
                                             <div className="flex items-center space-x-2">
                                                 <span className="font-semibold">
-                                                    <Badge>CANCELLED</Badge>
+                                                    <Badge>COMPLETED</Badge>
                                                 </span>
                                                 {expandedPastRide ===
                                                 ride.id ? (
@@ -206,7 +272,7 @@ const RideDashboard = () => {
                                             </div>
                                         </div>
                                         {expandedPastRide === ride.id && (
-                                            <div className="mt-4 pt-4 border-t border-gray-200">
+                                            <div className="mt-4 pt-4 border-t">
                                                 <p>
                                                     <strong>
                                                         Seats Booked:
@@ -224,23 +290,19 @@ const RideDashboard = () => {
                                                         Rating:
                                                     </span>
                                                     <span className="text-yellow-400 flex">
-                                                        <Star
-                                                            className="fill-current"
-                                                            size={16}
-                                                        />
-                                                        <Star
-                                                            className="fill-current"
-                                                            size={16}
-                                                        />
-                                                        <Star
-                                                            className="fill-current"
-                                                            size={16}
-                                                        />
-                                                        <Star
-                                                            className="fill-current"
-                                                            size={16}
-                                                        />
-                                                        <Star size={16} />
+                                                        {[...Array(5)].map(
+                                                            (_, i) => (
+                                                                <Star
+                                                                    key={i}
+                                                                    className={
+                                                                        i < 4
+                                                                            ? "fill-current"
+                                                                            : ""
+                                                                    }
+                                                                    size={16}
+                                                                />
+                                                            )
+                                                        )}
                                                     </span>
                                                 </div>
                                             </div>
@@ -252,6 +314,39 @@ const RideDashboard = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            {activeRide && (
+                <div className="fixed bottom-0 left-10 right-0 bg-background border-t p-4 flex justify-between items-center">
+                    <div>
+                        <p className="font-semibold">Active Ride</p>
+                        <p className="text-sm text-muted-foreground">
+                            {activeRide.pickup} → {activeRide.destination}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                            <Clock className="inline-block mr-2 h-4 w-4" />
+                            {formatRideTime(rideTimer)}
+                        </p>
+                    </div>
+                    <div className="flex space-x-2">
+                        {isRidePaused ? (
+                            <Button size="sm" onClick={resumeRide}>
+                                <Play className="mr-2 h-4 w-4" /> Resume
+                            </Button>
+                        ) : (
+                            <Button size="sm" onClick={pauseRide}>
+                                <Pause className="mr-2 h-4 w-4" /> Pause
+                            </Button>
+                        )}
+                        <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={endRide}
+                        >
+                            <StopCircle className="mr-2 h-4 w-4" /> End Ride
+                        </Button>
+                    </div>
+                </div>
+            )}
         </TabsContent>
     );
 };
