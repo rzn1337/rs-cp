@@ -5,25 +5,29 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { from, to, vehicleID, fare, scheduledFor, date } = body;
+        // const { from, to, vehicleID, fare, scheduledFor, date } = body;
+        const {
+            scheduledFor,
+            fare,
+            vehicleID,
+            from,
+            to,
+            // seats,
+            // stops,
+            premiumFare,
+        } = body;
 
         const driverID = (await getTokenData(request)) as string;
 
-        console.log(from, to, vehicleID, fare, scheduledFor, date, driverID);
-
-        const dateString = "2024-10-01";
-        const timeString = "15:56";
-
-        const isoDateTimeString = `${dateString}T${timeString}:00.000Z`;
-
-        const dateISO = new Date(isoDateTimeString);
+        console.log(body);
 
         const ride = await prisma.ride.create({
             data: {
+                ...(typeof premiumFare === "number" ? { premiumFare } : {}),
                 driverID,
                 vehicleID,
-                fare: parseFloat(fare),
-                scheduledFor: dateISO,
+                fare,
+                scheduledFor,
                 route: {
                     create: {
                         from,

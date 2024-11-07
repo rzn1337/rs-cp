@@ -38,6 +38,7 @@ export default function RootLayout({
                         {children}
                     </main>
                 </SidebarProvider>
+                <Toaster />
             </body>
         </html>
     );

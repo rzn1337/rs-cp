@@ -49,14 +49,23 @@ model Vehicle {
   user         User        @relation(fields: [userID], references: [id])
   make         String
   model        String
-  seats        Int
+  // seats        Int
   year         Int
   type         VehicleType @default(SEDAN)
   licensePlate String      @unique
   createdAt    DateTime    @default(now())
   Ride         Ride[]
+  seats        Seat[]
 
   @@map("vehicles")
+}
+
+model Seat {
+  id         String  @id @default(cuid())
+  vehicleID  String
+  vehicle    Vehicle @relation(fields: [vehicleID], references: [id])
+  seatNumber Int // Seat position or identifier
+  isPremium  Boolean @default(false) // Marks seat as premium or not
 }
 
 enum VehicleType {
@@ -73,6 +82,7 @@ model Ride {
   vehicleID    String
   vehicle      Vehicle     @relation(fields: [vehicleID], references: [id])
   fare         Float
+  premiumFare  Float?
   createdAt    DateTime    @default(now())
   status       RideStatus  @default(SCHEDULED)
   scheduledFor DateTime

@@ -43,12 +43,12 @@ const CreateRideTab = () => {
         from: "",
         to: "",
         date: "",
-        scheduledFor: "",
+        time: "",
         fare: "",
         vehicleID: "",
         seats: "",
         stops: "",
-        premiumPrice: "",
+        premiumFare: "",
     });
 
     useEffect(() => {
@@ -65,35 +65,42 @@ const CreateRideTab = () => {
     const handleCreateRide = async () => {
         const {
             date,
-            scheduledFor,
+            time,
             fare,
             vehicleID,
             from,
             to,
             seats,
             stops,
-            premiumPrice,
+            premiumFare,
         } = newRide;
 
         // Constructing the ride data to send to the backend
         const rideData = {
-            date,
-            scheduledFor,
+            scheduledFor: new Date(`${date}T${time}`),
             fare: parseFloat(fare),
             vehicleID,
             from,
             to,
             seats: parseInt(seats),
             stops: stops.split(",").map((stop) => stop.trim()),
-            isPremiumSeat,
-            premiumPrice: isPremiumSeat ? parseFloat(premiumPrice) : null,
+            premiumFare: isPremiumSeat ? parseFloat(premiumFare) : null,
         };
+
+        console.log("Ride data: ", rideData, date, time);
 
         try {
             const response: AxiosResponse = await axios.post(
                 "/api/create-ride",
                 rideData
             );
+            console.log(response);
+            if (response.status === 200) {
+                toast({
+                    title: "Ride created successfully",
+                    description: `You have scheduled a ride for ${newRide.time} on ${newRide.date}`
+                })
+            }
         } catch (error) {
             console.error(error);
             toast({
@@ -105,12 +112,12 @@ const CreateRideTab = () => {
                 from: "",
                 to: "",
                 date: "",
-                scheduledFor: "",
                 fare: "",
                 vehicleID: "",
+                time: "",
                 seats: "",
                 stops: "",
-                premiumPrice: "",
+                premiumFare: "",
             });
             setIsPremiumSeat(false);
         }
@@ -161,11 +168,11 @@ const CreateRideTab = () => {
                                     <Input
                                         id="time"
                                         type="time"
-                                        value={newRide.scheduledFor}
+                                        value={newRide.time}
                                         onChange={(e) =>
                                             setNewRide({
                                                 ...newRide,
-                                                scheduledFor: e.target.value,
+                                                time: e.target.value,
                                             })
                                         }
                                         className="pl-8"
@@ -191,7 +198,7 @@ const CreateRideTab = () => {
                                                 seats: e.target.value,
                                             })
                                         }
-                                        placeholder="Number of seats"
+                                        placeholder="Feature coming soon..."
                                         className="pl-8"
                                     />
                                     <Users
@@ -285,7 +292,7 @@ const CreateRideTab = () => {
                                         stops: e.target.value,
                                     })
                                 }
-                                placeholder="Add stops (comma-separated)"
+                                placeholder="Add stops (comma-separated), Feature coming soon..."
                                 className="pl-8"
                             />
                         </div>
@@ -322,11 +329,11 @@ const CreateRideTab = () => {
                                         type="number"
                                         min="0"
                                         step="0.01"
-                                        value={newRide.premiumPrice}
+                                        value={newRide.premiumFare}
                                         onChange={(e) =>
                                             setNewRide({
                                                 ...newRide,
-                                                premiumPrice: e.target.value,
+                                                premiumFare: e.target.value,
                                             })
                                         }
                                         placeholder="Premium price"
