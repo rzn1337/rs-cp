@@ -31,6 +31,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ManageRideDialog from "@/components/ManageRideDialog";
 import { Badge } from "@/components/ui/badge";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 const RideDashboard = () => {
     const [expandedPastRide, setExpandedPastRide] = useState<number | null>(
@@ -139,6 +140,8 @@ const RideDashboard = () => {
         setIsRidePaused(false);
     };
 
+    const { toast } = useToast();
+
     const formatRideTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
@@ -155,6 +158,16 @@ const RideDashboard = () => {
                 updatedRide
             );
             console.log(response);
+            const newRide = response.data.data
+            console.log(newRide)
+            setUpcomingRides((prev) =>
+                prev.map((ride) =>
+                    ride.id === newRide.id
+                        ? newRide
+                        : ride
+                )
+            );
+            toast({ title: "Your ride has been updated" });
         } catch (error) {
             console.error(error);
         }

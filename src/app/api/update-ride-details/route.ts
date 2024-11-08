@@ -30,7 +30,21 @@ export async function PATCH(request: NextRequest) {
                 scheduledFor,
                 route: { update: { to, from } },
             },
-            include: { route: true },
+            include: {
+                route: true,
+                passengers: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                name: true,
+                                profileImage: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         if (!ride) {

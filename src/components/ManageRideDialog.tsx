@@ -91,6 +91,7 @@ export default function ManageRideDialog({
         console.log(updatedRide);
         setRide(updatedRide);
         handleUpdateRide(updatedRide);
+        setIsOpen(false);
     };
 
     const onRemovePassenger = (passengerId: string) => {
