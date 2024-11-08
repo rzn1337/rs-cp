@@ -1,12 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapPin, CreditCard, Car, Plus, X, CheckCircle2 } from "lucide-react";
+import {
+    MapPin,
+    CreditCard,
+    Car,
+    Plus,
+    X,
+    CheckCircle2,
+    Eye,
+    Edit,
+    Trash2,
+} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -31,7 +42,13 @@ import {
 import axios from "axios";
 
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import AddVehicleDialog from "@/components/AddRideDialog";
 const PAYMENT_METHODS = [
     {
         id: "visa",
@@ -65,26 +82,106 @@ const PAYMENT_METHODS = [
     },
 ];
 
+interface Seat {
+    id: string;
+    vehicleID: string;
+    seatNumber: number;
+    isPremium: boolean;
+}
+
+interface Vehicle {
+    id: string;
+    userID: string;
+    make: string;
+    model: string;
+    year: number;
+    type: string;
+    licensePlate: string;
+    createdAt: string;
+    seats: Seat[];
+}
+
 // Helper function to generate random ride data for the past year
 const generateRideData = () => {
-    const today = new Date()
-    const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate())
-    const data = {}
-    
+    const today = new Date();
+    const oneYearAgo = new Date(
+        today.getFullYear() - 1,
+        today.getMonth(),
+        today.getDate()
+    );
+    const data = {};
+
     for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
-      const key = d.toISOString().split('T')[0]
-      data[key] = Math.floor(Math.random() * 5) // 0 to 4 rides per day
+        const key = d.toISOString().split("T")[0];
+        data[key] = Math.floor(Math.random() * 5); // 0 to 4 rides per day
     }
-    
-    return data
-  }
-  
-  const rideData = generateRideData()
+
+    return data;
+};
+
+const rideData = generateRideData();
 
 export default function UserProfile() {
-    const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
-    const [vehicles, setVehicles] = useState([]);
     const [selectedPayments, setSelectedPayments] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleSubmit = async (vehicleData) => {
+        // Handle the vehicle and seats creation
+        setIsAddVehicleOpen(false);
+        console.log(vehicleData);
+        const response = await axios.post("/api/register-vehicle", vehicleData);
+        console.log(response);
+    };
+
+    const [vehicles, setVehicles] = useState<Vehicle[]>([
+        {
+            id: "cm38y5vsv0001bw3ihum62t5a",
+            userID: "cm2rpsurx0000fx219ytog036",
+            make: "Porsche",
+            model: "911",
+            year: 2020,
+            type: "COUPE",
+            licensePlate: "PRH-2020",
+            createdAt: "2024-11-08T16:24:27.965Z",
+            seats: [
+                {
+                    id: "cm38y5w2m0002bw3ipni349xz",
+                    vehicleID: "cm38y5vsv0001bw3ihum62t5a",
+                    seatNumber: 1,
+                    isPremium: true,
+                },
+                {
+                    id: "cm38y5w2m0003bw3ijibkkq1a",
+                    vehicleID: "cm38y5vsv0001bw3ihum62t5a",
+                    seatNumber: 2,
+                    isPremium: false,
+                },
+            ],
+        },
+    ]);
+    const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
+    const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(
+        null
+    );
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    const handleEdit = (updatedVehicle: Vehicle) => {
+        // Placeholder for edit functionality
+        setVehicles(
+            vehicles.map((v) =>
+                v.id === updatedVehicle.id ? updatedVehicle : v
+            )
+        );
+        setIsEditModalOpen(false);
+    };
+
+    const handleDelete = (id: string) => {
+        // Placeholder for delete functionality
+        setVehicles(vehicles.filter((v) => v.id !== id));
+        setIsDeleteDialogOpen(false);
+    };
 
     const handlePaymentMethodToggle = (paymentId) => {
         setSelectedPayments((prev) =>
@@ -130,42 +227,44 @@ export default function UserProfile() {
             console.log(response);
             setVehicles(response.data.data);
         };
-        fetchVehicles();
+        // fetchVehicles();
     }, []);
-    const [hoveredDay, setHoveredDay] = useState(null)
+    const [hoveredDay, setHoveredDay] = useState(null);
 
-  const getColor = (count) => {
-    if (count === 0) return 'bg-gray-100'
-    if (count === 1) return 'bg-green-200'
-    if (count === 2) return 'bg-green-300'
-    if (count === 3) return 'bg-green-400'
-    return 'bg-green-600'
-  }
+    const getColor = (count) => {
+        if (count === 0) return "bg-gray-100";
+        if (count === 1) return "bg-green-200";
+        if (count === 2) return "bg-green-300";
+        if (count === 3) return "bg-green-400";
+        return "bg-green-600";
+    };
 
     const renderHeatmap = () => {
         const cells = Object.entries(rideData).map(([date, count]) => (
-          <TooltipProvider key={date}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  className={`w-3 h-3 rounded-sm ${getColor(count)}`}
-                  onMouseEnter={() => setHoveredDay({ date, count })}
-                  onMouseLeave={() => setHoveredDay(null)}
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{date}: {count} ride{count !== 1 ? 's' : ''}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ))
-    
+            <TooltipProvider key={date}>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <div
+                            className={`w-3 h-3 rounded-sm ${getColor(count)}`}
+                            onMouseEnter={() => setHoveredDay({ date, count })}
+                            onMouseLeave={() => setHoveredDay(null)}
+                        />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>
+                            {date}: {count} ride{count !== 1 ? "s" : ""}
+                        </p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+        ));
+
         return (
-          <div className="grid grid-cols-[repeat(53,_1fr)] gap-1 mb-4">
-            {cells}
-          </div>
-        )
-      }
+            <div className="grid grid-cols-[repeat(53,_1fr)] gap-1 mb-4">
+                {cells}
+            </div>
+        );
+    };
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -201,23 +300,7 @@ export default function UserProfile() {
                         Vehicle Info
                     </TabsTrigger>
                 </TabsList>
-                {/* <TabsContent value="trip-history">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Trip History</CardTitle>
-                            <CardDescription>
-                                View your past rides on the map
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
-                                <span className="text-gray-500">
-                                    Interactive Map View
-                                </span>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent> */}
+
                 <TabsContent value="trip-history">
                     <Card>
                         <CardHeader>
@@ -297,6 +380,7 @@ export default function UserProfile() {
                         </CardContent>
                     </Card>
                 </TabsContent>
+
                 <TabsContent value="vehicle-info">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
@@ -327,8 +411,8 @@ export default function UserProfile() {
                                                 Type:{" "}
                                                 {vehicle.type.toLowerCase()}
                                             </p>
-                                            <p>Seats: {vehicle.seats}</p>
-                                            <p>Model: {vehicle.year}</p>
+                                            <p>Seats: {vehicle.seats.length}</p>
+                                            <p>Year: {vehicle.year}</p>
                                             <p>
                                                 License Plate:{" "}
                                                 {vehicle.licensePlate}
@@ -342,15 +426,237 @@ export default function UserProfile() {
                                                 }
                                             </p>
                                         </CardContent>
+                                        <CardFooter className="flex justify-between">
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => {
+                                                    setSelectedVehicle(vehicle);
+                                                    setIsViewModalOpen(true);
+                                                }}
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => {
+                                                    setSelectedVehicle(vehicle);
+                                                    setIsEditModalOpen(true);
+                                                }}
+                                            >
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => {
+                                                    setSelectedVehicle(vehicle);
+                                                    setIsDeleteDialogOpen(true);
+                                                }}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </CardFooter>
                                     </Card>
                                 ))}
                             </div>
                         </CardContent>
                     </Card>
+
+                    {/* View Modal */}
+                    <Dialog
+                        open={isViewModalOpen}
+                        onOpenChange={setIsViewModalOpen}
+                    >
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Vehicle Details</DialogTitle>
+                            </DialogHeader>
+                            {selectedVehicle && (
+                                <div className="space-y-4">
+                                    <p>
+                                        <strong>Make:</strong>{" "}
+                                        {selectedVehicle.make}
+                                    </p>
+                                    <p>
+                                        <strong>Model:</strong>{" "}
+                                        {selectedVehicle.model}
+                                    </p>
+                                    <p>
+                                        <strong>Year:</strong>{" "}
+                                        {selectedVehicle.year}
+                                    </p>
+                                    <p>
+                                        <strong>Type:</strong>{" "}
+                                        {selectedVehicle.type}
+                                    </p>
+                                    <p>
+                                        <strong>License Plate:</strong>{" "}
+                                        {selectedVehicle.licensePlate}
+                                    </p>
+                                    <p>
+                                        <strong>Registration Date:</strong>{" "}
+                                        {new Date(
+                                            selectedVehicle.createdAt
+                                        ).toLocaleDateString()}
+                                    </p>
+                                    <p>
+                                        <strong>Seats:</strong>
+                                    </p>
+                                    <ul>
+                                        {selectedVehicle.seats.map((seat) => (
+                                            <li key={seat.id}>
+                                                Seat {seat.seatNumber}:{" "}
+                                                {seat.isPremium
+                                                    ? "Premium"
+                                                    : "Standard"}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </DialogContent>
+                    </Dialog>
+
+                    {/* Edit Modal */}
+                    <Dialog
+                        open={isEditModalOpen}
+                        onOpenChange={setIsEditModalOpen}
+                    >
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Edit Vehicle</DialogTitle>
+                            </DialogHeader>
+                            {selectedVehicle && (
+                                <form
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const formData = new FormData(
+                                            e.currentTarget
+                                        );
+                                        const updatedVehicle = {
+                                            ...selectedVehicle,
+                                            make: formData.get(
+                                                "make"
+                                            ) as string,
+                                            model: formData.get(
+                                                "model"
+                                            ) as string,
+                                            year: parseInt(
+                                                formData.get("year") as string
+                                            ),
+                                            type: formData.get(
+                                                "type"
+                                            ) as string,
+                                            licensePlate: formData.get(
+                                                "licensePlate"
+                                            ) as string,
+                                        };
+                                        handleEdit(updatedVehicle);
+                                    }}
+                                >
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label htmlFor="make">Make</Label>
+                                            <Input
+                                                id="make"
+                                                name="make"
+                                                defaultValue={
+                                                    selectedVehicle.make
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="model">Model</Label>
+                                            <Input
+                                                id="model"
+                                                name="model"
+                                                defaultValue={
+                                                    selectedVehicle.model
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="year">Year</Label>
+                                            <Input
+                                                id="year"
+                                                name="year"
+                                                type="number"
+                                                defaultValue={
+                                                    selectedVehicle.year
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="type">Type</Label>
+                                            <Input
+                                                id="type"
+                                                name="type"
+                                                defaultValue={
+                                                    selectedVehicle.type
+                                                }
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="licensePlate">
+                                                License Plate
+                                            </Label>
+                                            <Input
+                                                id="licensePlate"
+                                                name="licensePlate"
+                                                defaultValue={
+                                                    selectedVehicle.licensePlate
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                    <DialogFooter className="mt-4">
+                                        <Button type="submit">
+                                            Save changes
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
+                            )}
+                        </DialogContent>
+                    </Dialog>
+
+                    {/* Delete Confirmation Dialog */}
+                    <Dialog
+                        open={isDeleteDialogOpen}
+                        onOpenChange={setIsDeleteDialogOpen}
+                    >
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Confirm Deletion</DialogTitle>
+                                <DialogDescription>
+                                    Are you sure you want to delete this
+                                    vehicle? This action cannot be undone.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setIsDeleteDialogOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    onClick={() =>
+                                        selectedVehicle &&
+                                        handleDelete(selectedVehicle.id)
+                                    }
+                                >
+                                    Delete
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </TabsContent>
             </Tabs>
 
-            <Dialog open={isAddVehicleOpen} onOpenChange={setIsAddVehicleOpen}>
+            {/* <Dialog open={isAddVehicleOpen} onOpenChange={setIsAddVehicleOpen}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Add New Vehicle</DialogTitle>
@@ -431,7 +737,13 @@ export default function UserProfile() {
                         </DialogFooter>
                     </form>
                 </DialogContent>
-            </Dialog>
+            </Dialog> */}
+
+            <AddVehicleDialog
+                isOpen={isAddVehicleOpen}
+                onOpenChange={setIsAddVehicleOpen}
+                onSubmit={handleSubmit}
+            />
         </div>
     );
 }

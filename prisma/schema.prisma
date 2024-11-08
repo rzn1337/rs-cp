@@ -66,6 +66,8 @@ model Seat {
   vehicle    Vehicle @relation(fields: [vehicleID], references: [id])
   seatNumber Int // Seat position or identifier
   isPremium  Boolean @default(false) // Marks seat as premium or not
+
+  @@map("seats")
 }
 
 enum VehicleType {

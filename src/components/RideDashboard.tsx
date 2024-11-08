@@ -333,7 +333,7 @@ const RideDashboard = () => {
                     <div>
                         <p className="font-semibold">Active Ride</p>
                         <p className="text-sm text-muted-foreground">
-                            {activeRide.pickup} → {activeRide.destination}
+                            {activeRide.route.from} → {activeRide.route.to}
                         </p>
                         <p className="text-sm text-muted-foreground">
                             <Clock className="inline-block mr-2 h-4 w-4" />

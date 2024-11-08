@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { make, model, year, licensePlate, seats } = body;
+        const { make, model, year, licensePlate, seats, type } = body;
 
         const userID = (await getTokenData(request)) as string;
 
@@ -21,16 +21,38 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const vehicle = await prisma.vehicle.create({
+        console.log(body);
+
+        const newVehicle = await prisma.vehicle.create({
             data: {
                 userID, // Set the foreign key relation
                 make,
+                type,
                 model,
                 year: parseInt(year, 10),
                 licensePlate,
-                seats: parseInt(seats, 10),
             },
         });
+
+        if (Array.isArray(seats) && seats.length > 0) {
+            const seatsData = seats.map((seat) => ({
+              vehicleID: newVehicle.id,
+              seatNumber: seat.seatNumber,
+              isPremium: seat.isPremium || false,
+            }));
+      
+            // Bulk insert seats
+            await prisma.seat.createMany({
+              data: seatsData,
+            });
+          }
+
+          const vehicle = await prisma.vehicle.findUnique({
+            where: { id: newVehicle.id },
+            include: {
+              seats: true, // Include all associated seats
+            },
+          });
 
         const response = NextResponse.json({
             message: "Vehicle registered successfully",
