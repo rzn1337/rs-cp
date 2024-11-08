@@ -127,42 +127,24 @@ export default function UserProfile() {
 
     const handleSubmit = async (vehicleData) => {
         // Handle the vehicle and seats creation
-        setIsAddVehicleOpen(false);
-        console.log(vehicleData);
-        const response = await axios.post("/api/register-vehicle", vehicleData);
-        console.log(response);
+        try {
+            console.log(vehicleData);
+            const response = await axios.post(
+                "/api/register-vehicle",
+                vehicleData
+            );
+            setVehicles((prev) => [...prev, response.data.data]);
+            console.log(response);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsAddVehicleOpen(false);
+        }
     };
 
-    const [vehicles, setVehicles] = useState<Vehicle[]>([
-        {
-            id: "cm38y5vsv0001bw3ihum62t5a",
-            userID: "cm2rpsurx0000fx219ytog036",
-            make: "Porsche",
-            model: "911",
-            year: 2020,
-            type: "COUPE",
-            licensePlate: "PRH-2020",
-            createdAt: "2024-11-08T16:24:27.965Z",
-            seats: [
-                {
-                    id: "cm38y5w2m0002bw3ipni349xz",
-                    vehicleID: "cm38y5vsv0001bw3ihum62t5a",
-                    seatNumber: 1,
-                    isPremium: true,
-                },
-                {
-                    id: "cm38y5w2m0003bw3ijibkkq1a",
-                    vehicleID: "cm38y5vsv0001bw3ihum62t5a",
-                    seatNumber: 2,
-                    isPremium: false,
-                },
-            ],
-        },
-    ]);
+    const [vehicles, setVehicles] = useState([]);
     const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
-    const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(
-        null
-    );
+    const [selectedVehicle, setSelectedVehicle] = useState(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -227,7 +209,7 @@ export default function UserProfile() {
             console.log(response);
             setVehicles(response.data.data);
         };
-        // fetchVehicles();
+        fetchVehicles();
     }, []);
     const [hoveredDay, setHoveredDay] = useState(null);
 

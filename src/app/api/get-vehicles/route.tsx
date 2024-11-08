@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
             where: {
                 userID: { equals: userID },
             },
+            include: { seats: true },
         });
 
         const response = NextResponse.json({
