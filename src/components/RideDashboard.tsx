@@ -33,7 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
-const RideDashboard = () => {
+const RideDashboard = ({ rides }) => {
     const [expandedPastRide, setExpandedPastRide] = useState<number | null>(
         null
     );
@@ -44,19 +44,12 @@ const RideDashboard = () => {
     const [rideTimer, setRideTimer] = useState(0);
 
     useEffect(() => {
-        const fetchRides = async () => {
-            const response = await axios.get("/api/get-rides");
-            response.data.data.forEach((ride) => {
-                if (ride.status === "SCHEDULED") {
-                    setUpcomingRides((prev) => [...prev, ride]);
-                } else {
-                    setPastRides((prev) => [...prev, ride]);
-                }
-            });
-            console.log(response);
-        };
-        fetchRides();
-    }, [setUpcomingRides, setPastRides]);
+        const scheduledRides = rides.filter((ride) => ride.status === "SCHEDULED");
+        const pastRidesList = rides.filter((ride) => ride.status !== "SCHEDULED");
+    
+        setUpcomingRides(scheduledRides);
+        setPastRides(pastRidesList);
+    }, [rides]);
 
     useEffect(() => {
         let intervalId: ReturnType<typeof setInterval> | null = null;
@@ -158,14 +151,10 @@ const RideDashboard = () => {
                 updatedRide
             );
             console.log(response);
-            const newRide = response.data.data
-            console.log(newRide)
+            const newRide = response.data.data;
+            console.log(newRide);
             setUpcomingRides((prev) =>
-                prev.map((ride) =>
-                    ride.id === newRide.id
-                        ? newRide
-                        : ride
-                )
+                prev.map((ride) => (ride.id === newRide.id ? newRide : ride))
             );
             toast({ title: "Your ride has been updated" });
         } catch (error) {

@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
     try {
         const userID = (await getTokenData(request)) as string;
-
+        console.log(userID);
         const createdRides = await prisma.ride.findMany({
             where: { driverID: userID },
             include: {
@@ -25,16 +25,18 @@ export async function GET(request: NextRequest) {
             },
         });
 
-        if (createdRides.length <= 0) {
-            return NextResponse.json(
-                {
-                    message: "Couldnt fetch rides",
+        console.log(createdRides.length)
 
-                    success: false,
-                },
-                { status: 500 }
-            );
-        }
+        // if (createdRides.length <= 0) {
+        //     return NextResponse.json(
+        //         {
+        //             message: "Couldnt fetch rides",
+
+        //             success: false,
+        //         },
+        //         { status: 500 }
+        //     );
+        // }
 
         const response = NextResponse.json({
             message: "Created rides fetched successfully",

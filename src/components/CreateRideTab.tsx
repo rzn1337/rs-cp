@@ -36,7 +36,7 @@ interface Vehicle {
     year: number;
 }
 
-const CreateRideTab = () => {
+const CreateRideTab = ({ setRides }) => {
     const [isPremiumSeat, setIsPremiumSeat] = useState(false);
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [newRide, setNewRide] = useState({
@@ -96,10 +96,11 @@ const CreateRideTab = () => {
             );
             console.log(response);
             if (response.status === 200) {
+                setRides((prev) => [...prev, response.data.data]);
                 toast({
                     title: "Ride created successfully",
-                    description: `You have scheduled a ride for ${newRide.time} on ${newRide.date}`
-                })
+                    description: `You have scheduled a ride for ${newRide.time} on ${newRide.date}`,
+                });
             }
         } catch (error) {
             console.error(error);

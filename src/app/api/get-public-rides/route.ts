@@ -45,7 +45,9 @@ export async function GET(request: NextRequest) {
                 ride: {
                     include: {
                         driver: true,
-                        vehicle: true,
+                        vehicle: {
+                            include: { seats: true },
+                        },
                         passengers: true,
                     },
                 },
