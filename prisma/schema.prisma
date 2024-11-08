@@ -61,11 +61,12 @@ model Vehicle {
 }
 
 model Seat {
-  id         String  @id @default(cuid())
+  id         String    @id @default(cuid())
   vehicleID  String
-  vehicle    Vehicle @relation(fields: [vehicleID], references: [id])
+  vehicle    Vehicle   @relation(fields: [vehicleID], references: [id])
   seatNumber Int // Seat position or identifier
-  isPremium  Boolean @default(false) // Marks seat as premium or not
+  isPremium  Boolean   @default(false) // Marks seat as premium or not
+  Booking    Booking[]
 
   @@map("seats")
 }
@@ -102,7 +103,10 @@ model Booking {
   rideID   String
   ride     Ride     @relation(fields: [rideID], references: [id])
   bookedAt DateTime @default(now())
+  seatID   String
+  seat     Seat     @relation(fields: [seatID], references: [id])
 
+  @@unique([rideID, seatID], name: "rideID_seatID")
   @@unique([userID, rideID], name: "userID_rideID")
   @@map("bookings")
 }

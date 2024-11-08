@@ -1157,7 +1157,7 @@ const RideCard = ({ ride, onBookRide }) => (
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center text-gray-600">
             <Car className="h-4 w-4 mr-2" />
-            <span>{ride.ride.vehicle.seats} seats available</span>
+            <span>{ride.ride.vehicle.seats.length} seats available</span>
           </div>
           <div className="flex items-center font-medium">
             <DollarSign className="h-4 w-4" />
@@ -1218,6 +1218,7 @@ export default function Dashboard() {
         const response = await fetch(`/api/get-public-rides?search=${searchTerm}&limit=10`)
         const data = await response.json()
         setRides(data.data)
+        console.log(data)
       } catch (error) {
         console.error("Error fetching rides:", error)
       }
