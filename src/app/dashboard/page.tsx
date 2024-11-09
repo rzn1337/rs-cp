@@ -37,6 +37,7 @@ import {
 import {
     Tooltip,
     TooltipContent,
+    TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -177,118 +178,279 @@ import axios from "axios";
 //     );
 // };
 
-const SeatMap = ({ seats = [], onSeatSelect, selectedSeat }) => {
-  // Helper functions
-  const isSeatTaken = (seatId) => seats.find(seat => seat.id === seatId)?.isTaken;
-  const isPremiumSeat = (seatId) => seats.find(seat => seat.id === seatId)?.isPremium;
-  const shouldShowSeat = (seatId) => seatId !== "DRIVER";
+// const SeatMap = ({ seats = [], onSeatSelect, selectedSeat }) => {
+//   // Helper functions
+//   const isSeatTaken = (seatId) => seats.find(seat => seat.id === seatId)?.isTaken;
+//   const isPremiumSeat = (seatId) => seats.find(seat => seat.id === seatId)?.isPremium;
+//   const shouldShowSeat = (seatId) => seatId !== "DRIVER";
 
-  // Group seats into rows: front row with 2 seats + driver, others with up to 3 seats each
-  const groupedSeats = seats.reduce((acc, seat, index) => {
-    if (index === 0) {
-      // Front row (left seat + empty middle + driver)
-      acc.push([seat.id, null, "DRIVER"]);
-    } else {
-      // Other rows with up to 3 seats
-      const rowIndex = Math.floor((index - 1) / 3) + 1;
-      acc[rowIndex] = acc[rowIndex] || [];
-      acc[rowIndex].push(seat.id);
-    }
-    return acc;
-  }, []);
+//   // Group seats into rows: front row with 2 seats + driver, others with up to 3 seats each
+//   const groupedSeats = seats.reduce((acc, seat, index) => {
+//     if (index === 0) {
+//       // Front row (left seat + empty middle + driver)
+//       acc.push([seat.id, null, "DRIVER"]);
+//     } else {
+//       // Other rows with up to 3 seats
+//       const rowIndex = Math.floor((index - 1) / 3) + 1;
+//       acc[rowIndex] = acc[rowIndex] || [];
+//       acc[rowIndex].push(seat.id);
+//     }
+//     return acc;
+//   }, []);
 
-  return (
-    <div className="w-full max-w-xs mx-auto">
-      <div className="mb-4 flex items-center justify-center space-x-4 text-sm">
-        <div className="flex items-center">
-          <div className="w-4 h-4 rounded-sm border border-gray-300 bg-white mr-2" />
-          <span>Available</span>
-        </div>
-        <div className="flex items-center">
-          <div className="w-4 h-4 rounded-sm border border-gray-300 bg-yellow-100 mr-2" />
-          <span>Premium</span>
-        </div>
-        <div className="flex items-center">
-          <div className="w-4 h-4 rounded-sm border border-gray-300 bg-gray-200 mr-2" />
-          <span>Taken</span>
-        </div>
-      </div>
+//   return (
+//     <div className="w-full max-w-xs mx-auto">
+//       <div className="mb-4 flex items-center justify-center space-x-4 text-sm">
+//         <div className="flex items-center">
+//           <div className="w-4 h-4 rounded-sm border border-gray-300 bg-white mr-2" />
+//           <span>Available</span>
+//         </div>
+//         <div className="flex items-center">
+//           <div className="w-4 h-4 rounded-sm border border-gray-300 bg-yellow-100 mr-2" />
+//           <span>Premium</span>
+//         </div>
+//         <div className="flex items-center">
+//           <div className="w-4 h-4 rounded-sm border border-gray-300 bg-gray-200 mr-2" />
+//           <span>Taken</span>
+//         </div>
+//       </div>
 
-      <div className="relative bg-white p-4 rounded-lg border">
-        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-sm text-gray-500">
-          Front
-        </div>
+//       <div className="relative bg-white p-4 rounded-lg border">
+//         <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-sm text-gray-500">
+//           Front
+//         </div>
 
-        <div className="flex flex-col items-center space-y-2">
-          {groupedSeats.map((row, rowIndex) => (
-            <div
-              key={rowIndex}
-              className="grid grid-cols-3 gap-0 w-full place-items-center"
-            >
-              {row.map((seatId, seatIndex) => {
-                if (seatId === null) {
-                  return (
-                    <div
-                      key={`space-${seatIndex}`}
-                      className="w-8 h-8"
-                    />
-                  );
-                }
+//         <div className="flex flex-col items-center space-y-2">
+//           {groupedSeats.map((row, rowIndex) => (
+//             <div
+//               key={rowIndex}
+//               className="grid grid-cols-3 gap-0 w-full place-items-center"
+//             >
+//               {row.map((seatId, seatIndex) => {
+//                 if (seatId === null) {
+//                   return (
+//                     <div
+//                       key={`space-${seatIndex}`}
+//                       className="w-8 h-8"
+//                     />
+//                   );
+//                 }
 
-                if (!shouldShowSeat(seatId)) {
-                  return (
-                    <div
-                      key={`driver-${seatIndex}`}
-                      className="w-8 h-8 bg-gray-100 rounded-sm flex items-center justify-center"
-                    >
-                      <span className="text-xs text-gray-400">D</span>
+//                 if (!shouldShowSeat(seatId)) {
+//                   return (
+//                     <div
+//                       key={`driver-${seatIndex}`}
+//                       className="w-8 h-8 bg-gray-100 rounded-sm flex items-center justify-center"
+//                     >
+//                       <span className="text-xs text-gray-400">D</span>
+//                     </div>
+//                   );
+//                 }
+
+//                 const taken = isSeatTaken(seatId);
+//                 const premium = isPremiumSeat(seatId);
+//                 const selected = selectedSeat === seatId;
+
+//                 return (
+//                   <Tooltip key={seatId}>
+//                     <TooltipTrigger>
+//                       <button
+//                         className={cn(
+//                           "w-8 h-8 rounded-sm border flex items-center justify-center transition-colors",
+//                           taken && "bg-gray-200 cursor-not-allowed",
+//                           premium && !taken && "bg-yellow-100 hover:bg-yellow-200",
+//                           !premium && !taken && "bg-white hover:bg-gray-100",
+//                           selected && "ring-2 ring-blue-500"
+//                         )}
+//                         onClick={() => !taken && onSeatSelect(seatId)}
+//                         disabled={taken}
+//                       >
+//                         {selected ? (
+//                           <Check className="h-4 w-4 text-blue-500" />
+//                         ) : (
+//                           <span className="text-xs">{seatId}</span>
+//                         )}
+//                       </button>
+//                     </TooltipTrigger>
+//                     <TooltipContent>
+//                       <p>
+//                         Seat {seatId}
+//                         {premium && " (Premium)"}
+//                         {taken && " - Taken"}
+//                       </p>
+//                     </TooltipContent>
+//                   </Tooltip>
+//                 );
+//               })}
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+interface SeatMapProps {
+    seats: Seat[];
+    onSeatSelect: (seatId: string) => void;
+    selectedSeat: string | null;
+}
+
+interface Seat {
+    id: string;
+    isTaken: boolean;
+    isPremium: boolean;
+}
+
+function SeatMap({ seats = [], onSeatSelect, selectedSeat }: SeatMapProps) {
+    // Helper functions
+    const isSeatTaken = (seatId: string) =>
+        seats.find((seat) => seat.id === seatId)?.isTaken;
+    const isPremiumSeat = (seatId: string) =>
+        seats.find((seat) => seat.id === seatId)?.isPremium;
+    const shouldShowSeat = (seatId: string) => seatId !== "DRIVER";
+
+    // Group seats into rows: front row with 2 seats + driver, others with up to 3 seats each
+    const groupedSeats = seats.reduce<string[][]>((acc, seat, index) => {
+        if (index === 0) {
+            // Front row (left seat + empty middle + driver)
+            acc.push([seat.id, null, "DRIVER"]);
+        } else {
+            // Other rows with up to 3 seats
+            const rowIndex = Math.floor((index - 1) / 3) + 1;
+            acc[rowIndex] = acc[rowIndex] || [];
+            acc[rowIndex].push(seat.id);
+        }
+        return acc;
+    }, []);
+
+    return (
+        <Card className="w-full max-w-sm mx-auto">
+            <CardHeader>
+                <CardTitle className="text-center">Seat Selection</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="mb-4 flex items-center justify-center space-x-4 text-sm">
+                    <div className="flex items-center">
+                        <Badge variant="outline" className="mr-2 w-4 h-4 p-0" />
+                        <span>Available</span>
                     </div>
-                  );
-                }
+                    <div className="flex items-center">
+                        <Badge
+                            variant="secondary"
+                            className="mr-2 w-4 h-4 p-0 bg-yellow-100"
+                        />
+                        <span>Premium</span>
+                    </div>
+                    <div className="flex items-center">
+                        <Badge
+                            variant="secondary"
+                            className="mr-2 w-4 h-4 p-0"
+                        />
+                        <span>Taken</span>
+                    </div>
+                </div>
 
-                const taken = isSeatTaken(seatId);
-                const premium = isPremiumSeat(seatId);
-                const selected = selectedSeat === seatId;
+                <div className="relative bg-white p-4 rounded-lg border">
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 text-sm text-muted-foreground bg-background px-2">
+                        Front
+                    </div>
 
-                return (
-                  <Tooltip key={seatId}>
-                    <TooltipTrigger>
-                      <button
-                        className={cn(
-                          "w-8 h-8 rounded-sm border flex items-center justify-center transition-colors",
-                          taken && "bg-gray-200 cursor-not-allowed",
-                          premium && !taken && "bg-yellow-100 hover:bg-yellow-200",
-                          !premium && !taken && "bg-white hover:bg-gray-100",
-                          selected && "ring-2 ring-blue-500"
-                        )}
-                        onClick={() => !taken && onSeatSelect(seatId)}
-                        disabled={taken}
-                      >
-                        {selected ? (
-                          <Check className="h-4 w-4 text-blue-500" />
-                        ) : (
-                          <span className="text-xs">{seatId}</span>
-                        )}
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        Seat {seatId}
-                        {premium && " (Premium)"}
-                        {taken && " - Taken"}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+                    <TooltipProvider>
+                        <div className="flex flex-col items-center space-y-1">
+                            {groupedSeats.map((row, rowIndex) => (
+                                <div
+                                    key={rowIndex}
+                                    className="grid grid-cols-3 gap-1 w-full place-items-center"
+                                >
+                                    {row.map((seatId, seatIndex) => {
+                                        if (seatId === null) {
+                                            return (
+                                                <div
+                                                    key={`space-${seatIndex}`}
+                                                    className="w-8 h-8"
+                                                />
+                                            );
+                                        }
 
+                                        if (!shouldShowSeat(seatId)) {
+                                            return (
+                                                <div
+                                                    key={`driver-${seatIndex}`}
+                                                    className="w-8 h-8 bg-muted rounded-sm flex items-center justify-center"
+                                                >
+                                                    <span className="text-xs text-muted-foreground">
+                                                        D
+                                                    </span>
+                                                </div>
+                                            );
+                                        }
+
+                                        const taken = isSeatTaken(seatId);
+                                        const premium = isPremiumSeat(seatId);
+                                        const selected =
+                                            selectedSeat === seatId;
+
+                                        return (
+                                            <Tooltip key={seatId}>
+                                                <TooltipTrigger asChild>
+                                                    <button
+                                                        className={cn(
+                                                            "w-8 h-8 rounded-sm border flex items-center justify-center transition-colors",
+                                                            taken &&
+                                                                "bg-secondary cursor-not-allowed",
+                                                            premium &&
+                                                                !taken &&
+                                                                "bg-yellow-100 hover:bg-yellow-200",
+                                                            !premium &&
+                                                                !taken &&
+                                                                "bg-background hover:bg-muted",
+                                                            selected &&
+                                                                "ring-2 ring-primary"
+                                                        )}
+                                                        onClick={() =>
+                                                            !taken &&
+                                                            onSeatSelect(seatId)
+                                                        }
+                                                        disabled={taken}
+                                                        aria-label={`Select seat ${seatId}${
+                                                            premium
+                                                                ? " (Premium)"
+                                                                : ""
+                                                        }${
+                                                            taken
+                                                                ? " - Taken"
+                                                                : ""
+                                                        }`}
+                                                    >
+                                                        {selected ? (
+                                                            <Check className="h-4 w-4 text-primary" />
+                                                        ) : (
+                                                            <span className="text-xs">
+                                                                {seatId}
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>
+                                                        Seat {seatId}
+                                                        {premium &&
+                                                            " (Premium)"}
+                                                        {taken && " - Taken"}
+                                                    </p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        );
+                                    })}
+                                </div>
+                            ))}
+                        </div>
+                    </TooltipProvider>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
 
 const RideCard = ({ ride, onBookRide }) => (
     <Card className="hover:bg-gray-50 transition-colors">
@@ -434,12 +596,12 @@ export default function Dashboard() {
     }, [searchTerm]);
 
     const seats = [
-      { id: 1, isTaken: false, isPremium: true },
-      { id: 2, isTaken: false },
-      { id: 3, isTaken: true },
-      { id: 4, isTaken: false },
-      { id: 5, isTaken: true, isPremium: true },
-  ];
+        { id: 1, isTaken: false, isPremium: true },
+        { id: 2, isTaken: false },
+        { id: 3, isTaken: true },
+        { id: 4, isTaken: false },
+        { id: 5, isTaken: true, isPremium: true },
+    ];
 
     return (
         <div className="container mx-auto px-4 py-6">
@@ -575,9 +737,7 @@ export default function Dashboard() {
                                 </p>
                                 <p className="text-sm text-gray-600">
                                     {format(
-                                        new Date(
-                                            selectedRide.scheduledFor
-                                        ),
+                                        new Date(selectedRide.scheduledFor),
                                         "PPP p"
                                     )}
                                 </p>
