@@ -233,7 +233,7 @@ export default function ManageRideDialog({
                     <Card>
                         <CardHeader>
                             <CardTitle>
-                                Passengers ({ride.seatsBooked})
+                                Passengers ({ride.bookings.length})
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -258,7 +258,7 @@ export default function ManageRideDialog({
                                 <User2 className="h-4 w-4" />
                             </AvatarFallback>
                         </Avatar>
-                                                <span>{passenger.name}</span>
+                                                <span>{passenger.user.username}</span>
                                             </div>
                                             <div>
                                                 <Button
