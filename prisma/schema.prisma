@@ -91,7 +91,7 @@ model Ride {
   scheduledFor DateTime
   route        Route?
   Complaint    Complaint[]
-  passengers   Booking[]
+  bookings     Booking[]
 
   @@map("rides")
 }

@@ -60,7 +60,9 @@ export async function GET(request: NextRequest) {
         //     });
 
         const rides = await prisma.ride.findMany({
-            where: { driverID: { not: userID } },
+            where: { driverID: { not: userID },  status: "SCHEDULED", bookings: {none: {
+                userID: userID
+            }}},
             select: {
                 id: true,
                 driver: {
@@ -76,12 +78,21 @@ export async function GET(request: NextRequest) {
                         model: true,
                         year: true,
                         type: true,
+                        seats: {
+                            select: {
+                                id: true,
+                                seatNumber: true,
+                                isPremium: true,
+                            },
+                        },
                     },
                 },
                 fare: true,
                 premiumFare: true,
                 scheduledFor: true,
-                passengers: true,
+                bookings: {
+                    select: { seat: true },
+                },
                 route: { select: { id: true, to: true, from: true } },
             },
             take: 10,
