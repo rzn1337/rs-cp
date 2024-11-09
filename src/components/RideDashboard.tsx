@@ -44,9 +44,13 @@ const RideDashboard = ({ rides }) => {
     const [rideTimer, setRideTimer] = useState(0);
 
     useEffect(() => {
-        const scheduledRides = rides.filter((ride) => ride.status === "SCHEDULED");
-        const pastRidesList = rides.filter((ride) => ride.status !== "SCHEDULED");
-    
+        const scheduledRides = rides.filter(
+            (ride) => ride.status === "SCHEDULED"
+        );
+        const pastRidesList = rides.filter(
+            (ride) => ride.status !== "SCHEDULED"
+        );
+
         setUpcomingRides(scheduledRides);
         setPastRides(pastRidesList);
     }, [rides]);

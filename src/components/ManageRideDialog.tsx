@@ -35,6 +35,7 @@ import {
     Clock,
     MapPin,
     Navigation,
+    User2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -248,17 +249,15 @@ export default function ManageRideDialog({
                                             className="flex items-center justify-between mb-4 p-2 rounded-lg hover:bg-accent"
                                         >
                                             <div className="flex items-center">
-                                                <Avatar className="h-8 w-8 mr-2">
-                                                    <AvatarImage
-                                                        src={passenger.avatar}
-                                                        alt={passenger.name}
-                                                    />
-                                                    <AvatarFallback>
-                                                        {passenger.name.charAt(
-                                                            0
-                                                        )}
-                                                    </AvatarFallback>
-                                                </Avatar>
+                                            <Avatar>
+                            <AvatarImage
+                                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${passenger.user.username}`}
+                                alt={passenger.user.username}
+                            />
+                            <AvatarFallback>
+                                <User2 className="h-4 w-4" />
+                            </AvatarFallback>
+                        </Avatar>
                                                 <span>{passenger.name}</span>
                                             </div>
                                             <div>
