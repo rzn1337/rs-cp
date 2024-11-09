@@ -109,7 +109,7 @@ export default function ViewRideDetailsDialog({ isOpen, onClose, ride }: ViewRid
           <div>
             <Label className="text-base">Passengers:</Label>
             <div className="flex flex-wrap gap-2 mt-2">
-              {ride.passengers.map((passenger) => (
+              {ride.bookings.map((passenger) => (
                 <div key={passenger.id} className="flex items-center bg-secondary rounded-full pl-1 pr-3 py-1">
                   <Avatar className="h-6 w-6 mr-2">
                     <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${passenger.name}`} alt={passenger.name} />

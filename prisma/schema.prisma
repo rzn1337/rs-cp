@@ -105,6 +105,7 @@ model Booking {
   bookedAt DateTime @default(now())
   seatID   String
   seat     Seat     @relation(fields: [seatID], references: [id])
+  farePaid Float
 
   @@unique([rideID, seatID], name: "rideID_seatID")
   @@unique([userID, rideID], name: "userID_rideID")

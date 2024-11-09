@@ -32,7 +32,7 @@ export async function PATCH(request: NextRequest) {
             },
             include: {
                 route: true,
-                passengers: {
+                bookings: {
                     include: {
                         user: {
                             select: {

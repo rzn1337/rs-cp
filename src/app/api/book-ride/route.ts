@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { rideID, seatID } = body;
+        const { rideID, seatID, farePaid } = body;
 
         console.log("rideID", rideID);
 
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         }
 
         const booking = await prisma.booking.create({
-            data: { rideID, userID, seatID },
+            data: { rideID, userID, seatID, farePaid },
         });
 
         if (!booking) {

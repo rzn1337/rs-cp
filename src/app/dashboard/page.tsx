@@ -457,13 +457,15 @@ import { useToast } from "@/hooks/use-toast";
 
 function SeatMap({ seats = [], takenSeats = [], onSeatSelect, selectedSeat }) {
     // Helper functions
-    const isSeatTaken = (seatId: string) => takenSeats.includes(seatId);
+    const isSeatTaken = (seatId: string) =>
+        takenSeats.some((seat) => seat.id === seatId);
+
     const isPremiumSeat = (seatId: string) =>
         seats.find((seat) => seat.id === seatId)?.isPremium;
     const shouldShowSeat = (seatId: string) => seatId !== "DRIVER";
 
     // Group seats into rows: front row with 2 seats + driver, others with up to 3 seats each
-    const groupedSeats = seats.reduce<string[][]>((acc, seat, index) => {
+    const groupedSeats = seats.reduce((acc, seat, index) => {
         if (index === 0) {
             // Front row (left seat + empty middle + driver)
             acc.push([seat.id, null, "DRIVER"]);
@@ -851,8 +853,10 @@ export default function Dashboard() {
     const { toast } = useToast();
 
     const getCurrentFare = () => {
-        if (!selectedRide || !selectedSeat)
+        if (!selectedRide || !selectedSeat) {
             return parseFloat(selectedRide?.fare || 0);
+        }
+
         return parseFloat(selectedRide?.premiumFare || selectedRide?.fare);
     };
 
@@ -998,7 +1002,8 @@ export default function Dashboard() {
                                 takenSeats={selectedRide.vehicle.seats.filter(
                                     (seat) =>
                                         selectedRide.bookings.some(
-                                            (s) => s.id === seat.id
+                                            (booking) =>
+                                                booking.seat.id === seat.id
                                         )
                                 )}
                                 selectedSeat={selectedSeat}

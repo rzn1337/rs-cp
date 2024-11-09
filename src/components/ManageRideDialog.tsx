@@ -238,7 +238,7 @@ export default function ManageRideDialog({
                         <CardContent>
                             <ScrollArea className="h-[200px] pr-4">
                                 <AnimatePresence>
-                                    {ride.passengers.map((passenger) => (
+                                    {ride.bookings.map((passenger) => (
                                         <motion.div
                                             key={passenger.id}
                                             initial={{ opacity: 0, y: 20 }}

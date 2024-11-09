@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
             },
             include: {
                 route: true,
-                passengers: {
+                bookings: {
                     include: {
                         user: {
                             select: {

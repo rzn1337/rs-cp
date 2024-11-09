@@ -199,7 +199,7 @@ const RideDashboard = ({ rides }) => {
                                         </div>
                                         <div className="text-right">
                                             <p className="font-semibold">
-                                                {ride.passengers.length} seats
+                                                {ride.bookings.length} seats
                                                 booked
                                             </p>
                                             <div className="flex space-x-2 mt-2">
