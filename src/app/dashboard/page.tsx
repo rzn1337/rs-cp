@@ -455,25 +455,31 @@ import { useToast } from "@/hooks/use-toast";
 //     );
 // }
 
-function SeatMap({ seats = [], takenSeats = [], onSeatSelect, selectedSeat }) {
+function SeatMap({
+    seats = [],
+    isPremiumSeatsAvailable,
+    takenSeats = [],
+    onSeatSelect,
+    selectedSeat,
+}) {
     // Helper functions
-    const isSeatTaken = (seatId: string) =>
-        takenSeats.some((seat) => seat.id === seatId);
+    const isSeatTaken = (s) => takenSeats.some((seat) => seat.id === s.id);
 
-    const isPremiumSeat = (seatId: string) =>
-        seats.find((seat) => seat.id === seatId)?.isPremium;
-    const shouldShowSeat = (seatId: string) => seatId !== "DRIVER";
+    const isPremiumSeat = (seat) =>
+        isPremiumSeatsAvailable ? seat.isPremium : false;
+    // seats.find((seat) => seat.id === seatId)?.isPremium;
+    const shouldShowSeat = (seat) => seat !== "DRIVER";
 
     // Group seats into rows: front row with 2 seats + driver, others with up to 3 seats each
     const groupedSeats = seats.reduce((acc, seat, index) => {
         if (index === 0) {
             // Front row (left seat + empty middle + driver)
-            acc.push([seat.id, null, "DRIVER"]);
+            acc.push([seat, null, "DRIVER"]);
         } else {
             // Other rows with up to 3 seats
             const rowIndex = Math.floor((index - 1) / 3) + 1;
             acc[rowIndex] = acc[rowIndex] || [];
-            acc[rowIndex].push(seat.id);
+            acc[rowIndex].push(seat);
         }
         return acc;
     }, []);
@@ -517,8 +523,8 @@ function SeatMap({ seats = [], takenSeats = [], onSeatSelect, selectedSeat }) {
                                     key={rowIndex}
                                     className="grid grid-cols-3 gap-1 w-full place-items-center"
                                 >
-                                    {row.map((seatId, seatIndex) => {
-                                        if (seatId === null) {
+                                    {row.map((seat, seatIndex) => {
+                                        if (seat === null) {
                                             return (
                                                 <div
                                                     key={`space-${seatIndex}`}
@@ -527,7 +533,7 @@ function SeatMap({ seats = [], takenSeats = [], onSeatSelect, selectedSeat }) {
                                             );
                                         }
 
-                                        if (!shouldShowSeat(seatId)) {
+                                        if (!shouldShowSeat(seat)) {
                                             return (
                                                 <div
                                                     key={`driver-${seatIndex}`}
@@ -540,18 +546,17 @@ function SeatMap({ seats = [], takenSeats = [], onSeatSelect, selectedSeat }) {
                                             );
                                         }
 
-                                        const taken = isSeatTaken(seatId);
-                                        const premium = isPremiumSeat(seatId);
-                                        const selected =
-                                            selectedSeat === seatId;
+                                        const taken = isSeatTaken(seat);
+                                        const premium = isPremiumSeat(seat);
+                                        const selected = selectedSeat === seat;
 
-                                        const seatNumber =
-                                            seats.find(
-                                                (seat) => seat.id === seatId
-                                            )?.seatNumber || "";
+                                        const seatNumber = seat.seatNumber;
+                                        // seats.find(
+                                        //     (seat) => seat.id === seatId
+                                        // )?.seatNumber || "";
 
                                         return (
-                                            <Tooltip key={seatId}>
+                                            <Tooltip key={seat.id}>
                                                 <TooltipTrigger asChild>
                                                     <button
                                                         className={cn(
@@ -569,7 +574,7 @@ function SeatMap({ seats = [], takenSeats = [], onSeatSelect, selectedSeat }) {
                                                         )}
                                                         onClick={() =>
                                                             !taken &&
-                                                            onSeatSelect(seatId)
+                                                            onSeatSelect(seat)
                                                         }
                                                         disabled={taken}
                                                         aria-label={`Select seat ${seatNumber}${
@@ -839,15 +844,8 @@ export default function Dashboard() {
 
     const takenSeats = ["3"];
 
-    const isPremiumSeat = (seatId) => {
-        const premiumSeats = {
-            sedan: ["1A", "1B"],
-            suv: ["1A", "1B", "2A", "2B"],
-            van: ["1A", "1B", "1C"],
-        };
-        const vehicleType =
-            selectedRide?.vehicle.make?.toLowerCase() || "sedan";
-        return premiumSeats[vehicleType]?.includes(seatId);
+    const isPremiumSeat = (seat) => {
+        return seat?.isPremium;
     };
 
     const { toast } = useToast();
@@ -856,6 +854,10 @@ export default function Dashboard() {
         if (!selectedRide || !selectedSeat) {
             return parseFloat(selectedRide?.fare || 0);
         }
+
+        return selectedRide.premiumFare && selectedSeat?.isPremium
+            ? parseFloat(selectedRide?.premiumFare)
+            : parseFloat(selectedRide.fare) || 0.0;
 
         return parseFloat(selectedRide?.premiumFare || selectedRide?.fare);
     };
@@ -999,6 +1001,9 @@ export default function Dashboard() {
 
                             <SeatMap
                                 seats={selectedRide.vehicle.seats}
+                                isPremiumSeatsAvailable={
+                                    selectedRide.premiumFare
+                                }
                                 takenSeats={selectedRide.vehicle.seats.filter(
                                     (seat) =>
                                         selectedRide.bookings.some(
@@ -1017,8 +1022,9 @@ export default function Dashboard() {
                                     </p>
                                     <p className="text-sm text-gray-600">
                                         {selectedSeat
-                                            ? `${selectedSeat} ${
-                                                  isPremiumSeat(selectedSeat)
+                                            ? `${selectedSeat.seatNumber} ${
+                                                  isPremiumSeat(selectedSeat) &&
+                                                  selectedRide?.premiumFare
                                                       ? "(Premium)"
                                                       : ""
                                               }`
@@ -1029,13 +1035,15 @@ export default function Dashboard() {
                                     <p className="text-sm font-medium">
                                         Total Fare
                                     </p>
-                                    <p className="text-sm font-semibold">
+                                    <p
+                                        className={`text-sm font-semibold ${
+                                            isPremiumSeat(selectedSeat) &&
+                                            selectedRide?.premiumFare
+                                                ? "text-yellow-600"
+                                                : ""
+                                        } `}
+                                    >
                                         ${getCurrentFare().toFixed(2)}
-                                        {isPremiumSeat(selectedSeat) && (
-                                            <span className="text-xs text-yellow-600 ml-1">
-                                                (Premium)
-                                            </span>
-                                        )}
                                     </p>
                                 </div>
                             </div>
