@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         }
 
         const booking = await prisma.booking.create({
-            data: { rideID, userID, seatID, farePaid },
+            data: { rideID, userID, seatID, farePaid: parseFloat(farePaid) },
         });
 
         if (!booking) {

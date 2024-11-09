@@ -863,7 +863,11 @@ export default function Dashboard() {
     };
 
     const handleConfirmBooking = async () => {
-        const bookingData = { seatID: selectedSeat, rideID: selectedRide.id };
+        const bookingData = {
+            seatID: selectedSeat.id,
+            rideID: selectedRide.id,
+            farePaid: getCurrentFare(),
+        };
         console.log(bookingData);
         try {
             const response = await axios.post("/api/book-ride", bookingData);
