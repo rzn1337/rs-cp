@@ -1,42 +1,6 @@
 "use client";
 
-import * as React from "react";
-import {
-    AudioWaveform,
-    BadgeCheck,
-    Bell,
-    BookOpen,
-    Bot,
-    ChevronRight,
-    ChevronsUpDown,
-    Command,
-    CreditCard,
-    Folder,
-    Forward,
-    Frame,
-    GalleryVerticalEnd,
-    Home,
-    LogOut,
-    Map,
-    MoreHorizontal,
-    PieChart,
-    Plus,
-    Settings,
-    Settings2,
-    Sparkles,
-    SquareTerminal,
-    Trash2,
-} from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import {
     Collapsible,
     CollapsibleContent,
@@ -52,7 +16,6 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import {
     Sidebar,
     SidebarContent,
@@ -60,7 +23,6 @@ import {
     SidebarGroup,
     SidebarGroupLabel,
     SidebarHeader,
-    SidebarInset,
     SidebarMenu,
     SidebarMenuAction,
     SidebarMenuButton,
@@ -68,93 +30,112 @@ import {
     SidebarMenuSub,
     SidebarMenuSubButton,
     SidebarMenuSubItem,
-    SidebarProvider,
     SidebarRail,
-    SidebarTrigger,
 } from "@/components/ui/sidebar";
+
+import axios from "axios";
+
+import { useEffect, useState } from "react";
+
+import {
+    Car,
+    History,
+    Bell,
+    User,
+    ChevronRight,
+    ChevronsUpDown,
+    CreditCard,
+    MapPin,
+    Forward,
+    Map,
+    MoreHorizontal,
+    PieChart,
+    Plus,
+    Settings,
+    Star,
+    Shield,
+    LogOut,
+    Home,
+    Clock,
+    Wallet,
+    Award,
+    User2
+} from "lucide-react";
 
 const data = {
     user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
+        name: "John Doe",
+        email: "john@example.com",
+        avatar: "/avatars/john.jpg",
     },
-    teams: [
+    // Transform teams into user roles/accounts
+    accounts: [
         {
-            name: "Acme Inc",
-            logo: GalleryVerticalEnd,
-            plan: "Enterprise",
+            name: "Personal",
+            logo: User,
+            plan: "Premium",
         },
         {
-            name: "Acme Corp.",
-            logo: AudioWaveform,
-            plan: "Startup",
-        },
-        {
-            name: "Evil Corp.",
-            logo: Command,
-            plan: "Free",
-        },
+            name: "Business",
+            logo: Award,
+            plan: "Corporate",
+        }
     ],
     navMain: [
         {
-            title: "Playground",
+            title: "Rides",
             url: "#",
-            icon: SquareTerminal,
+            icon: Car,
             isActive: true,
             items: [
                 {
-                    title: "History",
+                    title: "Book a Ride",
                     url: "#",
                 },
                 {
-                    title: "Starred",
+                    title: "Scheduled Rides",
                     url: "#",
                 },
                 {
-                    title: "Settings",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Models",
-            url: "#",
-            icon: Bot,
-            items: [
-                {
-                    title: "Genesis",
-                    url: "#",
-                },
-                {
-                    title: "Explorer",
-                    url: "#",
-                },
-                {
-                    title: "Quantum",
+                    title: "Favorites",
                     url: "#",
                 },
             ],
         },
         {
-            title: "Documentation",
+            title: "History",
             url: "#",
-            icon: BookOpen,
+            icon: History,
             items: [
                 {
-                    title: "Introduction",
+                    title: "Recent Rides",
                     url: "#",
                 },
                 {
-                    title: "Get Started",
+                    title: "Receipts",
                     url: "#",
                 },
                 {
-                    title: "Tutorials",
+                    title: "Reviews",
+                    url: "#",
+                },
+            ],
+        },
+        {
+            title: "Payments",
+            url: "#",
+            icon: Wallet,
+            items: [
+                {
+                    title: "Payment Methods",
                     url: "#",
                 },
                 {
-                    title: "Changelog",
+                    title: "Ride Credits",
+                    url: "#",
+                },
+                {
+                    title: "Billing History",
                     url: "#",
                 },
             ],
@@ -162,306 +143,297 @@ const data = {
         {
             title: "Settings",
             url: "#",
-            icon: Settings2,
+            icon: Settings,
             items: [
                 {
-                    title: "General",
+                    title: "Profile",
                     url: "#",
                 },
                 {
-                    title: "Team",
+                    title: "Preferences",
                     url: "#",
                 },
                 {
-                    title: "Billing",
+                    title: "Safety",
                     url: "#",
                 },
                 {
-                    title: "Limits",
+                    title: "Notifications",
                     url: "#",
                 },
             ],
         },
     ],
-    projects: [
+    // Transform projects into saved locations
+    savedLocations: [
         {
-            name: "Design Engineering",
+            name: "Home",
             url: "#",
-            icon: Frame,
+            icon: Home,
         },
         {
-            name: "Sales & Marketing",
+            name: "Work",
             url: "#",
-            icon: PieChart,
+            icon: MapPin,
         },
         {
-            name: "Travel",
+            name: "Gym",
             url: "#",
             icon: Map,
         },
     ],
 };
 
-export default function AppSidebar() {
-    const [activeItem, setActiveItem] = React.useState("home");
-    const [activeTeam, setActiveTeam] = React.useState(data.teams[0]);
+export default function RideshareSidebar() {
+    const [activeItem, setActiveItem] = useState("rides");
+    const [activeAccount, setActiveAccount] = useState(data.accounts[0]);
+    const [user, setUser] = useState(null);
 
-    const menuItems = [
-        { id: "home", icon: Home, label: "Home" },
-        { id: "history", icon: History, label: "Ride History" },
-        { id: "payment", icon: CreditCard, label: "Payment Methods" },
-        { id: "notifications", icon: Bell, label: "Notifications", badge: 3 },
-        { id: "settings", icon: Settings, label: "Settings" },
-    ];
+    useEffect(() => {
+        const fetchUser = async () => {
+            const response = await axios.get("/api/get-user");
+            setUser(response.data.data);
+        };
+        fetchUser();
+    }, []);
 
     return (
         <div className="flex h-screen">
-        <Sidebar collapsible="icon">
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton
-                                    size="lg"
-                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                                >
-                                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                        <activeTeam.logo className="size-4" />
-                                    </div>
-                                    <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <span className="truncate font-semibold">
-                                            {activeTeam.name}
-                                        </span>
-                                        <span className="truncate text-xs">
-                                            {activeTeam.plan}
-                                        </span>
-                                    </div>
-                                    <ChevronsUpDown className="ml-auto" />
-                                </SidebarMenuButton>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                                align="start"
-                                side="bottom"
-                                sideOffset={4}
-                            >
-                                <DropdownMenuLabel className="text-xs text-muted-foreground">
-                                    Teams
-                                </DropdownMenuLabel>
-                                {data.teams.map((team, index) => (
-                                    <DropdownMenuItem
-                                        key={team.name}
-                                        onClick={() => setActiveTeam(team)}
-                                        className="gap-2 p-2"
-                                    >
-                                        <div className="flex size-6 items-center justify-center rounded-sm border">
-                                            <team.logo className="size-4 shrink-0" />
-                                        </div>
-                                        {team.name}
-                                        <DropdownMenuShortcut>
-                                            ⌘{index + 1}
-                                        </DropdownMenuShortcut>
-                                    </DropdownMenuItem>
-                                ))}
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="gap-2 p-2">
-                                    <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                                        <Plus className="size-4" />
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        Add team
-                                    </div>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <Sidebar collapsible="icon">
+                <SidebarHeader>
                     <SidebarMenu>
-                        {data.navMain.map((item) => (
-                            <Collapsible
-                                key={item.title}
-                                asChild
-                                defaultOpen={item.isActive}
-                                className="group/collapsible"
-                            >
-                                <SidebarMenuItem>
-                                    <CollapsibleTrigger asChild>
-                                        <SidebarMenuButton tooltip={item.title}>
-                                            {item.icon && <item.icon />}
-                                            <span>{item.title}</span>
-                                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                                        </SidebarMenuButton>
-                                    </CollapsibleTrigger>
-                                    <CollapsibleContent>
-                                        <SidebarMenuSub>
-                                            {item.items?.map((subItem) => (
-                                                <SidebarMenuSubItem
-                                                    key={subItem.title}
-                                                >
-                                                    <SidebarMenuSubButton
-                                                        asChild
-                                                    >
-                                                        <a href={subItem.url}>
-                                                            <span>
-                                                                {subItem.title}
-                                                            </span>
-                                                        </a>
-                                                    </SidebarMenuSubButton>
-                                                </SidebarMenuSubItem>
-                                            ))}
-                                        </SidebarMenuSub>
-                                    </CollapsibleContent>
-                                </SidebarMenuItem>
-                            </Collapsible>
-                        ))}
-                    </SidebarMenu>
-                </SidebarGroup>
-                <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-                    <SidebarGroupLabel>Projects</SidebarGroupLabel>
-                    <SidebarMenu>
-                        {data.projects.map((item) => (
-                            <SidebarMenuItem key={item.name}>
-                                <SidebarMenuButton asChild>
-                                    <a href={item.url}>
-                                        <item.icon />
-                                        <span>{item.name}</span>
-                                    </a>
-                                </SidebarMenuButton>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <SidebarMenuAction showOnHover>
-                                            <MoreHorizontal />
-                                            <span className="sr-only">
-                                                More
-                                            </span>
-                                        </SidebarMenuAction>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        className="w-48 rounded-lg"
-                                        side="bottom"
-                                        align="end"
-                                    >
-                                        <DropdownMenuItem>
-                                            <Folder className="text-muted-foreground" />
-                                            <span>View Project</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <Forward className="text-muted-foreground" />
-                                            <span>Share Project</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem>
-                                            <Trash2 className="text-muted-foreground" />
-                                            <span>Delete Project</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </SidebarMenuItem>
-                        ))}
                         <SidebarMenuItem>
-                            <SidebarMenuButton className="text-sidebar-foreground/70">
-                                <MoreHorizontal className="text-sidebar-foreground/70" />
-                                <span>More</span>
-                            </SidebarMenuButton>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <SidebarMenuButton
+                                        size="lg"
+                                        className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                    >
+                                        <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                                            <activeAccount.logo className="size-4" />
+                                        </div>
+                                        <div className="grid flex-1 text-left text-sm leading-tight">
+                                            <span className="truncate font-semibold">
+                                                {activeAccount.name}
+                                            </span>
+                                            <span className="truncate text-xs">
+                                                {activeAccount.plan}
+                                            </span>
+                                        </div>
+                                        <ChevronsUpDown className="ml-auto" />
+                                    </SidebarMenuButton>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                                    align="start"
+                                    side="bottom"
+                                    sideOffset={4}
+                                >
+                                    <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                        Switch Account
+                                    </DropdownMenuLabel>
+                                    {data.accounts.map((account, index) => (
+                                        <DropdownMenuItem
+                                            key={account.name}
+                                            onClick={() => setActiveAccount(account)}
+                                            className="gap-2 p-2"
+                                        >
+                                            <div className="flex size-6 items-center justify-center rounded-sm border">
+                                                <account.logo className="size-4 shrink-0" />
+                                            </div>
+                                            {account.name}
+                                            <DropdownMenuShortcut>
+                                                ⌘{index + 1}
+                                            </DropdownMenuShortcut>
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </SidebarMenuItem>
                     </SidebarMenu>
-                </SidebarGroup>
-            </SidebarContent>
-            <SidebarFooter>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton
-                                    size="lg"
-                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                </SidebarHeader>
+                <SidebarContent>
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
+                        <SidebarMenu>
+                            {data.navMain.map((item) => (
+                                <Collapsible
+                                    key={item.title}
+                                    asChild
+                                    defaultOpen={item.isActive}
+                                    className="group/collapsible"
                                 >
-                                    <Avatar className="h-8 w-8 rounded-lg">
-                                        <AvatarImage
-                                            src={data.user.avatar}
-                                            alt={data.user.name}
-                                        />
-                                        <AvatarFallback className="rounded-lg">
-                                            CN
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <span className="truncate font-semibold">
-                                            {data.user.name}
-                                        </span>
-                                        <span className="truncate text-xs">
-                                            {data.user.email}
-                                        </span>
-                                    </div>
-                                    <ChevronsUpDown className="ml-auto size-4" />
+                                    <SidebarMenuItem>
+                                        <CollapsibleTrigger asChild>
+                                            <SidebarMenuButton
+                                                tooltip={item.title}
+                                            >
+                                                {item.icon && <item.icon />}
+                                                <span>{item.title}</span>
+                                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                            </SidebarMenuButton>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <SidebarMenuSub>
+                                                {item.items?.map((subItem) => (
+                                                    <SidebarMenuSubItem
+                                                        key={subItem.title}
+                                                    >
+                                                        <SidebarMenuSubButton
+                                                            asChild
+                                                        >
+                                                            <a href={subItem.url}>
+                                                                <span>{subItem.title}</span>
+                                                            </a>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                ))}
+                                            </SidebarMenuSub>
+                                        </CollapsibleContent>
+                                    </SidebarMenuItem>
+                                </Collapsible>
+                            ))}
+                        </SidebarMenu>
+                    </SidebarGroup>
+                    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+                        <SidebarGroupLabel>Saved Locations</SidebarGroupLabel>
+                        <SidebarMenu>
+                            {data.savedLocations.map((item) => (
+                                <SidebarMenuItem key={item.name}>
+                                    <SidebarMenuButton asChild>
+                                        <a href={item.url}>
+                                            <item.icon />
+                                            <span>{item.name}</span>
+                                        </a>
+                                    </SidebarMenuButton>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <SidebarMenuAction showOnHover>
+                                                <MoreHorizontal />
+                                                <span className="sr-only">More</span>
+                                            </SidebarMenuAction>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            className="w-48 rounded-lg"
+                                            side="bottom"
+                                            align="end"
+                                        >
+                                            <DropdownMenuItem>
+                                                <Car className="text-muted-foreground" />
+                                                <span>Book Ride Here</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem>
+                                                <Forward className="text-muted-foreground" />
+                                                <span>Share Location</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem className="text-red-500">
+                                                <Star className="text-muted-foreground" />
+                                                <span>Remove Favorite</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </SidebarMenuItem>
+                            ))}
+                            <SidebarMenuItem>
+                                <SidebarMenuButton className="text-sidebar-foreground/70">
+                                    <Plus className="text-sidebar-foreground/70" />
+                                    <span>Add Location</span>
                                 </SidebarMenuButton>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                                side="bottom"
-                                align="end"
-                                sideOffset={4}
-                            >
-                                <DropdownMenuLabel className="p-0 font-normal">
-                                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroup>
+                </SidebarContent>
+                <SidebarFooter>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <SidebarMenuButton
+                                        size="lg"
+                                        className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                    >
                                         <Avatar className="h-8 w-8 rounded-lg">
                                             <AvatarImage
-                                                src={data.user.avatar}
-                                                alt={data.user.name}
+                                                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${user?.username}`}
+                                                alt={user?.username}
                                             />
                                             <AvatarFallback className="rounded-lg">
-                                                CN
+                                            <User2 className="h-4 w-4" />
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="grid flex-1 text-left text-sm leading-tight">
                                             <span className="truncate font-semibold">
-                                                {data.user.name}
+                                                {user?.username}
                                             </span>
                                             <span className="truncate text-xs">
-                                                {data.user.email}
+                                                {user?.email}
                                             </span>
                                         </div>
-                                    </div>
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup>
+                                        <ChevronsUpDown className="ml-auto size-4" />
+                                    </SidebarMenuButton>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                                    side="bottom"
+                                    align="end"
+                                    sideOffset={4}
+                                >
+                                    <DropdownMenuLabel className="p-0 font-normal">
+                                        <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                        <Avatar className="h-8 w-8 rounded-lg">
+                                            <AvatarImage
+                                                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${user?.username}`}
+                                                alt={user?.username}
+                                            />
+                                            <AvatarFallback className="rounded-lg">
+                                            <User2 className="h-4 w-4" />
+                                            </AvatarFallback>
+                                        </Avatar>
+                                            <div className="grid flex-1 text-left text-sm leading-tight">
+                                                <span className="truncate font-semibold">
+                                                    {user?.username}
+                                                </span>
+                                                <span className="truncate text-xs">
+                                                    {user?.email}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuItem>
+                                            <Award />
+                                            Upgrade to Premium
+                                        </DropdownMenuItem>
+                                    </DropdownMenuGroup>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuItem>
+                                            <User />
+                                            Profile
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem>
+                                            <Shield />
+                                            Safety Center
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem>
+                                            <Bell />
+                                            Notifications
+                                        </DropdownMenuItem>
+                                    </DropdownMenuGroup>
+                                    <DropdownMenuSeparator />
                                     <DropdownMenuItem>
-                                        <Sparkles />
-                                        Upgrade to Pro
+                                        <LogOut />
+                                        Log out
                                     </DropdownMenuItem>
-                                </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup>
-                                    <DropdownMenuItem>
-                                        <BadgeCheck />
-                                        Account
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <CreditCard />
-                                        Billing
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Bell />
-                                        Notifications
-                                    </DropdownMenuItem>
-                                </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <LogOut />
-                                    Log out
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
-            <SidebarRail />
-        </Sidebar>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarFooter>
+                <SidebarRail />
+            </Sidebar>
         </div>
     );
 }
