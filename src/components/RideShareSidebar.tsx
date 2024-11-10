@@ -59,16 +59,12 @@ import {
     Clock,
     Wallet,
     Award,
-    User2
+    User2,
+    CarFront,
+    Briefcase
 } from "lucide-react";
 
 const data = {
-    user: {
-        name: "John Doe",
-        email: "john@example.com",
-        avatar: "/avatars/john.jpg",
-    },
-    // Transform teams into user roles/accounts
     accounts: [
         {
             name: "Personal",
@@ -77,7 +73,7 @@ const data = {
         },
         {
             name: "Business",
-            logo: Award,
+            logo: Briefcase,
             plan: "Corporate",
         }
     ],
@@ -85,16 +81,16 @@ const data = {
         {
             title: "Rides",
             url: "#",
-            icon: Car,
+            icon: CarFront,
             isActive: true,
             items: [
                 {
                     title: "Book a Ride",
-                    url: "#",
+                    url: "/dashboard",
                 },
                 {
-                    title: "Scheduled Rides",
-                    url: "#",
+                    title: "Create a New Ride",
+                    url: "/ride-management",
                 },
                 {
                     title: "Favorites",
@@ -109,7 +105,7 @@ const data = {
             items: [
                 {
                     title: "Recent Rides",
-                    url: "#",
+                    url: "/myrides",
                 },
                 {
                     title: "Receipts",
@@ -147,7 +143,7 @@ const data = {
             items: [
                 {
                     title: "Profile",
-                    url: "#",
+                    url: "/profile",
                 },
                 {
                     title: "Preferences",
@@ -319,7 +315,7 @@ export default function RideshareSidebar() {
                                             align="end"
                                         >
                                             <DropdownMenuItem>
-                                                <Car className="text-muted-foreground" />
+                                                <CarFront className="text-muted-foreground" />
                                                 <span>Book Ride Here</span>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
