@@ -12,13 +12,17 @@ export async function GET(request: NextRequest) {
         });
 
         const rides = await prisma.ride.findMany({
-            where: { driverID: { not: userID }, bookings: {some: {userID}} },
+            where: {
+                driverID: { not: userID },
+                bookings: { some: { userID } },
+            },
+            include: { driver: { select: { username: true } }, route: true, bookings: {where: {userID}} },
         });
 
         console.log(bookings);
 
         const response = NextResponse.json({
-            message: "Use rides fetched successfully",
+            message: "User rides fetched successfully",
             data: rides,
             success: true,
         });

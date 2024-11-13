@@ -20,6 +20,9 @@ import {
     MessageSquare,
     Star as StarIcon,
     AlertTriangle,
+    User,
+    Clock,
+    DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +46,8 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
+import { Separator } from "@/components/ui/separator";
+import ViewRideDialog from "@/components/ViewRideDialog";
 
 const StarRating = ({
     rating,
@@ -175,10 +180,10 @@ const mockRides: DayRides = {
 };
 
 const statusColors = {
-    scheduled: "bg-blue-100 text-blue-800",
-    enroute: "bg-yellow-100 text-yellow-800",
-    completed: "bg-green-100 text-green-800",
-    cancelled: "bg-red-100 text-red-800",
+    SCHEDULED: "bg-blue-200 text-blue-800",
+    ENROUTE: "bg-yellow-200 text-yellow-800",
+    COMPLETED: "bg-green-200 text-green-800",
+    CANCELLED: "bg-red-200 text-red-800",
 };
 
 const complaintCategories = [
@@ -204,7 +209,7 @@ export default function MyRidesCalendar() {
         null
     );
     const [bookings, setBookings] = useState([]);
-    const [bookingsByDate, setBookingsByDate] = useState(null);
+    const [bookingsByDate, setBookingsByDate] = useState({});
     const [complaintComment, setComplaintComment] = useState("");
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
@@ -300,7 +305,7 @@ export default function MyRidesCalendar() {
     };
 
     const selectedDateRides = selectedDate
-        ? mockRides[format(selectedDate, "yyyy-MM-dd")] || []
+        ? bookingsByDate[format(selectedDate, "yyyy-MM-dd")] || []
         : [];
 
     const indexBookingsByDate = (bookings) => {
@@ -320,11 +325,11 @@ export default function MyRidesCalendar() {
 
     const upcomingRides = useMemo(() => {
         const today = new Date();
-        return Object.values(mockRides)
+        return Object.values(bookingsByDate)
             .flat()
             .filter(
                 (ride) =>
-                    ride.status === "scheduled" && parseISO(ride.date) >= today
+                    ride.status === "SCHEDULED" && parseISO(ride.date) >= today
             )
             .sort(
                 (a, b) =>
@@ -348,6 +353,18 @@ export default function MyRidesCalendar() {
         };
         fetchAndIndexMyBookings();
     }, []);
+
+    const DetailItem = ({ icon: Icon, label, value, className = "" }) => (
+        <div className={`flex items-start space-x-3 ${className}`}>
+            <div className="mt-1">
+                <Icon className="w-5 h-5 text-gray-400" />
+            </div>
+            <div className="flex-1">
+                <div className="text-sm text-gray-500">{label}</div>
+                <div className="text-base mt-1 font-medium">{value}</div>
+            </div>
+        </div>
+    );
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -399,7 +416,8 @@ export default function MyRidesCalendar() {
                             <div className="grid grid-cols-7 gap-2">
                                 {monthDays.map((day, dayIdx) => {
                                     const dateKey = format(day, "yyyy-MM-dd");
-                                    const dayRides = mockRides[dateKey] || [];
+                                    const dayRides =
+                                        bookingsByDate[dateKey] || [];
                                     return (
                                         <Button
                                             key={day.toString()}
@@ -450,18 +468,67 @@ export default function MyRidesCalendar() {
                                     : "Select a date to view rides"}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="p-6">
                             {selectedDateRides.length > 0 ? (
-                                <ScrollArea className="h-[300px] w-full">
+                                <ScrollArea className="h-[500px] w-full pr-4">
                                     <div className="space-y-4">
                                         {selectedDateRides.map((ride) => (
-                                            <Card key={ride.id}>
-                                                <CardContent className="flex items-center justify-between p-4">
-                                                    <div className="flex flex-col flex-grow">
-                                                        <div className="flex justify-between items-center mb-2">
-                                                            <span className="text-lg font-semibold">
-                                                                {ride.time}
-                                                            </span>
+                                            <Card
+                                                key={ride.id}
+                                                className="hover:shadow-md transition-shadow duration-200"
+                                            >
+                                                <CardContent className="p-6">
+                                                    <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6">
+                                                        <div className="flex-grow space-y-4">
+                                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                                                <div className="flex items-center space-x-2">
+                                                                    <Clock className="h-5 w-5 text-gray-400" />
+                                                                    <span className="text-lg font-medium">
+                                                                        {new Date(
+                                                                            "2024-11-09T16:56:00.000Z"
+                                                                        ).toLocaleTimeString(
+                                                                            [],
+                                                                            {
+                                                                                hour: "2-digit",
+                                                                                minute: "2-digit",
+                                                                            }
+                                                                        )}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="space-y-3">
+                                                                <div className="flex items-center space-x-2">
+                                                                    <User className="h-4 w-4 text-gray-400" />
+                                                                    <span className="text-sm text-gray-600">
+                                                                        {
+                                                                            ride
+                                                                                .driver
+                                                                                .username
+                                                                        }
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className="flex items-center space-x-2">
+                                                                    <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                                                    <span className="text-sm text-gray-600">
+                                                                        {
+                                                                            ride
+                                                                                .route
+                                                                                .from
+                                                                        }{" "}
+                                                                        →{" "}
+                                                                        {
+                                                                            ride
+                                                                                .route
+                                                                                .to
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex flex-col items-end space-y-3 min-w-[120px]">
                                                             <Badge
                                                                 variant="secondary"
                                                                 className={`${
@@ -469,45 +536,40 @@ export default function MyRidesCalendar() {
                                                                         ride
                                                                             .status
                                                                     ]
-                                                                } uppercase`}
+                                                                } uppercase font-semibold px-3 py-1`}
                                                             >
                                                                 {ride.status}
                                                             </Badge>
-                                                        </div>
-                                                        <span className="text-sm text-gray-500">
-                                                            {ride.driverName}
-                                                        </span>
-                                                        <div className="flex items-center mt-2 text-sm text-gray-600">
-                                                            <MapPin className="h-4 w-4 mr-1" />
-                                                            {ride.pickup} to{" "}
-                                                            {ride.destination}
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-right ml-4">
-                                                        <span className="text-lg font-bold">
-                                                            {ride.price}
-                                                        </span>
-                                                        {ride.rating && (
-                                                            <div className="mt-1">
+                                                            <span className="text-xl font-bold text-green-600">
+                                                                $
+                                                                {
+                                                                    ride
+                                                                        .bookings[0]
+                                                                        .farePaid
+                                                                }
+                                                            </span>
+
+                                                            {ride.rating && (
                                                                 <StarRating
                                                                     rating={
                                                                         ride.rating
                                                                     }
                                                                 />
-                                                            </div>
-                                                        )}
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="mt-2"
-                                                            onClick={() =>
-                                                                handleRideClick(
-                                                                    ride
-                                                                )
-                                                            }
-                                                        >
-                                                            View Details
-                                                        </Button>
+                                                            )}
+
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="w-full sm:w-auto"
+                                                                onClick={() =>
+                                                                    handleRideClick(
+                                                                        ride
+                                                                    )
+                                                                }
+                                                            >
+                                                                View Details
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 </CardContent>
                                             </Card>
@@ -515,9 +577,14 @@ export default function MyRidesCalendar() {
                                     </div>
                                 </ScrollArea>
                             ) : (
-                                <p className="text-center text-gray-500">
-                                    No rides scheduled for this day.
-                                </p>
+                                <div className="flex flex-col items-center justify-center h-[300px] space-y-4">
+                                    <div className="text-gray-400">
+                                        <MapPin className="w-12 h-12" />
+                                    </div>
+                                    <p className="text-gray-500 text-lg">
+                                        No rides scheduled for this day
+                                    </p>
+                                </div>
                             )}
                         </CardContent>
                     </Card>
@@ -544,10 +611,21 @@ export default function MyRidesCalendar() {
                                                 <div className="flex justify-between items-center mb-2">
                                                     <span className="text-lg font-semibold">
                                                         {format(
-                                                            parseISO(ride.date),
+                                                            parseISO(
+                                                                ride.scheduledFor
+                                                            ),
                                                             "MMM d"
                                                         )}{" "}
-                                                        - {ride.time}
+                                                        -{" "}
+                                                        {new Date(
+                                                            selectedRide.scheduledFor
+                                                        ).toLocaleTimeString(
+                                                            [],
+                                                            {
+                                                                hour: "2-digit",
+                                                                minute: "2-digit",
+                                                            }
+                                                        )}
                                                     </span>
                                                     <Badge
                                                         variant="secondary"
@@ -597,10 +675,16 @@ export default function MyRidesCalendar() {
                             <div className="flex justify-between items-center">
                                 <span className="text-lg font-semibold">
                                     {format(
-                                        parseISO(selectedRide.date),
+                                        parseISO(selectedRide.scheduledFor),
                                         "MMM d"
                                     )}{" "}
-                                    - {selectedRide.time}
+                                    -{" "}
+                                    {new Date(
+                                        selectedRide.scheduledFor
+                                    ).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })}
                                 </span>
                                 <Badge
                                     variant="secondary"
@@ -613,18 +697,18 @@ export default function MyRidesCalendar() {
                             </div>
                             <div>
                                 <div className="font-medium">Driver</div>
-                                <div>{selectedRide.driverName}</div>
+                                <div>{selectedRide.driver.username}</div>
                             </div>
                             <div>
                                 <div className="font-medium">Route</div>
                                 <div>
-                                    {selectedRide.pickup} to{" "}
-                                    {selectedRide.destination}
+                                    {selectedRide.route.from} to{" "}
+                                    {selectedRide.route.to}
                                 </div>
                             </div>
                             <div>
                                 <div className="font-medium">Price</div>
-                                <div>{selectedRide.price}</div>
+                                <div>${selectedRide.bookings[0].farePaid}</div>
                             </div>
                             {selectedRide.rating && (
                                 <div>
@@ -633,7 +717,7 @@ export default function MyRidesCalendar() {
                                 </div>
                             )}
                             <div className="flex justify-end space-x-2">
-                                {selectedRide.status === "scheduled" && (
+                                {selectedRide.status === "SCHEDULED" && (
                                     <Button
                                         variant="destructive"
                                         onClick={handleCancelRide}
@@ -658,7 +742,7 @@ export default function MyRidesCalendar() {
                                             Rate Ride
                                         </Button>
                                     )}
-                                {selectedRide.status === "completed" && (
+                                {selectedRide.status === "COMPLETED" && (
                                     <Button
                                         variant="outline"
                                         onClick={handleFileComplaint}
@@ -672,6 +756,11 @@ export default function MyRidesCalendar() {
                     )}
                 </DialogContent>
             </Dialog>
+
+            {/* <ViewRideDialog
+                selectedRide={selectedRide}
+                setSelectedRide={setSelectedRide}
+            /> */}
 
             <Dialog
                 open={isMessageDialogOpen}
