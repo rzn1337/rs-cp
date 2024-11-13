@@ -325,17 +325,21 @@ export default function MyRidesCalendar() {
 
     const upcomingRides = useMemo(() => {
         const today = new Date();
+        today.setHours(0, 0, 0, 0);
         return Object.values(bookingsByDate)
             .flat()
             .filter(
                 (ride) =>
-                    ride.status === "SCHEDULED" && parseISO(ride.date) >= today
+                    ride.status === "SCHEDULED" &&
+                new Date(ride.scheduledFor)
+                 >= today
             )
             .sort(
                 (a, b) =>
-                    parseISO(a.date).getTime() - parseISO(b.date).getTime()
+                    parseISO(a.scheduledFor).getTime() -
+                    parseISO(b.scheduledFor).getTime()
             );
-    }, []);
+    }, [bookingsByDate]);
 
     useEffect(() => {
         const fetchAndIndexMyBookings = async () => {
@@ -602,7 +606,7 @@ export default function MyRidesCalendar() {
                                         <Card
                                             key={ride.id}
                                             className={
-                                                isToday(parseISO(ride.date))
+                                                isToday(parseISO(ride.scheduledFor))
                                                     ? "border-blue-500 border-2"
                                                     : ""
                                             }
@@ -618,7 +622,7 @@ export default function MyRidesCalendar() {
                                                         )}{" "}
                                                         -{" "}
                                                         {new Date(
-                                                            selectedRide.scheduledFor
+                                                            ride.scheduledFor
                                                         ).toLocaleTimeString(
                                                             [],
                                                             {
@@ -639,8 +643,8 @@ export default function MyRidesCalendar() {
                                                     </Badge>
                                                 </div>
                                                 <div className="text-sm text-gray-600 mb-2">
-                                                    {ride.pickup} to{" "}
-                                                    {ride.destination}
+                                                    {ride.route.from} to{" "}
+                                                    {ride.route.to}
                                                 </div>
                                                 <Button
                                                     variant="outline"
