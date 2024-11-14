@@ -1,24 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-    Calendar,
-    Clock,
-    Users,
-    DollarSign,
-    Car,
-    MapPin,
-    Plus,
-    ChevronDown,
-    ChevronUp,
-    Star,
-    UserMinus,
-    MessageCircle,
-    Play,
-    Pause,
-    StopCircle,
-} from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronDown, ChevronUp, Star } from "lucide-react";
+import { TabsContent } from "@/components/ui/tabs";
 import {
     Card,
     CardContent,
@@ -56,69 +40,21 @@ const RideDashboard = ({ rides }) => {
         setPastRides(pastRidesList);
     }, [rides]);
 
-    useEffect(() => {
-        let intervalId: ReturnType<typeof setInterval> | null = null;
+    // useEffect(() => {
+    //     let intervalId: ReturnType<typeof setInterval> | null = null;
 
-        if (activeRide && !isRidePaused) {
-            intervalId = setInterval(() => {
-                setRideTimer((prevTimer) => prevTimer + 1);
-            }, 1000);
-        }
+    //     if (activeRide && !isRidePaused) {
+    //         intervalId = setInterval(() => {
+    //             setRideTimer((prevTimer) => prevTimer + 1);
+    //         }, 1000);
+    //     }
 
-        return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-        };
-    }, [activeRide, isRidePaused]);
-
-    // const upcomingRides = [
-    //     {
-    //         id: 1,
-    //         date: "2023-05-20",
-    //         time: "14:00",
-    //         pickup: "Central Park",
-    //         destination: "JFK Airport",
-    //         seatsBooked: 3,
-    //     },
-    //     {
-    //         id: 2,
-    //         date: "2023-05-22",
-    //         time: "09:30",
-    //         pickup: "Times Square",
-    //         destination: "Brooklyn Bridge",
-    //         seatsBooked: 2,
-    //     },
-    //     {
-    //         id: 3,
-    //         date: "2023-05-20",
-    //         time: "14:00",
-    //         pickup: "Central Park",
-    //         destination: "JFK Airport",
-    //         seatsBooked: 3,
-    //     },
-    // ];
-
-    // const pastRides = [
-    //     {
-    //         id: 1,
-    //         date: "2023-05-15",
-    //         time: "11:00",
-    //         pickup: "Statue of Liberty",
-    //         destination: "Empire State Building",
-    //         seatsBooked: 4,
-    //         earnings: 120,
-    //     },
-    //     {
-    //         id: 2,
-    //         date: "2023-05-10",
-    //         time: "16:45",
-    //         pickup: "Broadway Theater",
-    //         destination: "Central Park",
-    //         seatsBooked: 2,
-    //         earnings: 75,
-    //     },
-    // ];
+    //     return () => {
+    //         if (intervalId) {
+    //             clearInterval(intervalId);
+    //         }
+    //     };
+    // }, [activeRide, isRidePaused]);
 
     const startRide = (ride) => {
         setActiveRide(ride);
@@ -204,7 +140,7 @@ const RideDashboard = ({ rides }) => {
                                         </div>
                                         <div className="text-right">
                                             <p className="font-semibold">
-                                                {ride.bookings.length} seats
+                                                {ride.bookings.length} seat(s)
                                                 booked
                                             </p>
                                             <div className="flex space-x-2 mt-2">
@@ -322,40 +258,8 @@ const RideDashboard = ({ rides }) => {
                 </Card>
             </div>
 
-            {/* {activeRide && (
-                <div className="fixed bottom-0 left-10 right-0 bg-background border-t p-4 flex justify-between items-center">
-                    <div>
-                        <p className="font-semibold">Active Ride</p>
-                        <p className="text-sm text-muted-foreground">
-                            {activeRide.route.from} → {activeRide.route.to}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                            <Clock className="inline-block mr-2 h-4 w-4" />
-                            {formatRideTime(rideTimer)}
-                        </p>
-                    </div>
-                    <div className="flex space-x-2">
-                        {isRidePaused ? (
-                            <Button size="sm" onClick={resumeRide}>
-                                <Play className="mr-2 h-4 w-4" /> Resume
-                            </Button>
-                        ) : (
-                            <Button size="sm" onClick={pauseRide}>
-                                <Pause className="mr-2 h-4 w-4" /> Pause
-                            </Button>
-                        )}
-                        <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={endRide}
-                        >
-                            <StopCircle className="mr-2 h-4 w-4" /> End Ride
-                        </Button>
-                    </div>
-                </div>
-            )} */}
-
-            {activeRide && <RideMiniplayer />}
+            
+            {activeRide && <RideMiniplayer ride={activeRide} />}
         </TabsContent>
     );
 };

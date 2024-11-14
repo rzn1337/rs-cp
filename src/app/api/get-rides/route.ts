@@ -20,12 +20,19 @@ export async function GET(request: NextRequest) {
                                 profileImage: true,
                             },
                         },
+                        seat: {
+                            select: {
+                                id: true,
+                                seatNumber: true,
+                                isPremium: true,
+                            },
+                        },
                     },
                 },
             },
         });
 
-        console.log(createdRides.length)
+        console.log(createdRides.length);
 
         // if (createdRides.length <= 0) {
         //     return NextResponse.json(
