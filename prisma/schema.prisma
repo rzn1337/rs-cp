@@ -89,6 +89,7 @@ model Ride {
   createdAt    DateTime    @default(now())
   status       RideStatus  @default(SCHEDULED)
   scheduledFor DateTime
+  elapsedTime  Int?
   route        Route?
   Complaint    Complaint[]
   bookings     Booking[]

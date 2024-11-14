@@ -8,7 +8,7 @@ export async function PATCH(request: NextRequest) {
 
     try {
         const body = await request.json();
-        const { rideID, status } = body;
+        const { rideID, status, elapsedTime } = body;
 
         if (!validStatuses.includes(status)) {
             return NextResponse.json(
@@ -17,10 +17,21 @@ export async function PATCH(request: NextRequest) {
             );
         }
 
-        const ride = await prisma.ride.update({
-            where: { id: rideID },
-            data: { status },
-        });
+        let ride;
+
+        if (elapsedTime) {
+            ride = await prisma.ride.update({
+                where: { id: rideID },
+                data: { status, elapsedTime },
+            }); 
+        } else {
+            ride = await prisma.ride.update({
+                where: { id: rideID },
+                data: { status },
+            });
+        }
+
+        
 
         if (!ride) {
             return NextResponse.json(

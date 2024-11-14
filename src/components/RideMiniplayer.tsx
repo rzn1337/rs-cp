@@ -3,21 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import {
     ChevronUp,
     ChevronDown,
-    Phone,
     MessageSquare,
-    AlertTriangle,
     X,
     Play,
     Pause,
@@ -26,38 +17,51 @@ import {
 } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { statusColors } from "@/constants/statusColors";
 
-export default function RideMiniplayer(activeRide) {
+export default function RideMiniplayer({ activeRide, startRide, endRide }) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
-    const [rideStatus, setRideStatus] = useState("En route");
     const [isRideActive, setIsRideActive] = useState(false);
-
-    const statusColors = {
-        SCHEDULED: "bg-blue-200 text-blue-800",
-        ENROUTE: "bg-yellow-200 text-yellow-800",
-        COMPLETED: "bg-green-200 text-green-800",
-        CANCELLED: "bg-red-200 text-red-800",
-    };
+    const [elapsedTime, setElapsedTime] = useState(0);
 
     const toggleExpand = () => setIsExpanded(!isExpanded);
     const toggleMinimize = () => setIsMinimized(!isMinimized);
 
-    const startRide = () => {
+    const onStartRide = () => {
         setIsRideActive(true);
-        setRideStatus("Ride in progress");
+        startRide();
     };
 
-    const pauseRide = () => {
-        setRideStatus("Ride paused");
-    };
-
-    const endRide = () => {
+    const onPauseRide = () => {
         setIsRideActive(false);
-        setRideStatus("Ride ended");
     };
 
-    const totalEarnings = activeRide.ride.bookings.reduce(
+    const onEndRide = () => {
+        setIsRideActive(false);
+        endRide(elapsedTime);
+    };
+
+    useEffect(() => {
+        let interval;
+        if (isRideActive) {
+            interval = setInterval(() => {
+                setElapsedTime((prevTime) => prevTime + 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [isRideActive]);
+
+    const formatTime = (seconds) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        return `${hours.toString().padStart(2, "0")}:${minutes
+            .toString()
+            .padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+    };
+
+    const totalEarnings = activeRide.bookings.reduce(
         (total, booking) => total + booking.farePaid,
         0
     );
@@ -95,35 +99,35 @@ export default function RideMiniplayer(activeRide) {
                             <Badge
                                 variant="secondary"
                                 className={`${
-                                    statusColors[activeRide.ride.status]
+                                    statusColors[activeRide.status]
                                 } uppercase`}
                             >
-                                {activeRide.ride.status}
+                                {activeRide.status}
                             </Badge>
                         </span>
                         <span className="text-sm font-medium">
-                            Time Elapsed: 15 mins
+                            Time Elapsed: {formatTime(elapsedTime)}
                         </span>
                     </div>
 
                     <div className="flex justify-between gap-2 mb-4">
                         <Button
                             className="flex-1"
-                            onClick={startRide}
-                            disabled={isRideActive}
+                            onClick={onStartRide}
+                            disabled={isRideActive || activeRide.status === "COMPLETED"}
                         >
                             <Play className="w-4 h-4 mr-2" /> Start
                         </Button>
                         <Button
                             className="flex-1"
-                            onClick={pauseRide}
+                            onClick={onPauseRide}
                             disabled={!isRideActive}
                         >
                             <Pause className="w-4 h-4 mr-2" /> Pause
                         </Button>
                         <Button
                             className="flex-1"
-                            onClick={endRide}
+                            onClick={onEndRide}
                             disabled={!isRideActive}
                         >
                             <StopCircle className="w-4 h-4 mr-2" /> End
@@ -143,7 +147,7 @@ export default function RideMiniplayer(activeRide) {
                                         Passenger Details
                                     </h3>
 
-                                    {activeRide.ride.bookings.map((booking) => (
+                                    {activeRide.bookings.map((booking) => (
                                         <div
                                             key={booking.id}
                                             className="flex items-center justify-between mb-2 text-sm"
@@ -165,7 +169,6 @@ export default function RideMiniplayer(activeRide) {
                                                     {booking.user.username} (4.8
                                                     ★)
                                                 </span>
-                                                {/* <span>2 passengers</span> */}
                                             </div>
                                             <span>
                                                 <Button
@@ -183,50 +186,13 @@ export default function RideMiniplayer(activeRide) {
                                         main entrance.
                                     </p>
                                 </div>
-                                {/* <div className="border-t pt-4 mt-4">
-                                    <h3 className="font-semibold mb-2">
-                                        Earnings
-                                    </h3>
-                                    <div className="text-sm">
-                                        {activeRide.ride.bookings?.map(
-                                            (booking) => (
-                                                <div
-                                                    key={booking.id}
-                                                    className="flex justify-between"
-                                                >
-                                                    <span>
-                                                        {booking.user.username}{" "}
-                                                        - Seat{" "}
-                                                        {
-                                                            booking.seat
-                                                                ?.seatNumber
-                                                        }
-                                                    </span>
-                                                    <span>
-                                                        $
-                                                        {booking.farePaid.toFixed(
-                                                            2
-                                                        )}
-                                                    </span>
-                                                </div>
-                                            )
-                                        )}
-                                        <div className="flex justify-between font-semibold mt-2">
-                                            <span>Total Earnings:</span>
-                                            <span>
-                                                ${totalEarnings.toFixed(2)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div> */}
                                 <div className="border-t pt-4 mt-4">
                                     <h3 className="font-semibold mb-2">
                                         Earnings
                                     </h3>
                                     <Table>
-                                        
-                                        <TableBody className="">
-                                            {activeRide.ride.bookings?.map(
+                                        <TableBody>
+                                            {activeRide.bookings?.map(
                                                 (booking) => (
                                                     <TableRow key={booking.id}>
                                                         <TableCell>

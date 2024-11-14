@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import RideMiniplayer from "./RideMiniplayer";
+import { statusColors } from "@/constants/statusColors";
 
 const RideDashboard = ({ rides }) => {
     const [expandedPastRide, setExpandedPastRide] = useState<number | null>(
@@ -40,24 +41,8 @@ const RideDashboard = ({ rides }) => {
         setPastRides(pastRidesList);
     }, [rides]);
 
-    // useEffect(() => {
-    //     let intervalId: ReturnType<typeof setInterval> | null = null;
-
-    //     if (activeRide && !isRidePaused) {
-    //         intervalId = setInterval(() => {
-    //             setRideTimer((prevTimer) => prevTimer + 1);
-    //         }, 1000);
-    //     }
-
-    //     return () => {
-    //         if (intervalId) {
-    //             clearInterval(intervalId);
-    //         }
-    //     };
-    // }, [activeRide, isRidePaused]);
-
     const startRide = (ride) => {
-        setActiveRide(ride);
+        setActiveRide((prev) => (prev ? { ...prev, status: "ENROUTE" } : prev));
         setIsRidePaused(false);
     };
 
@@ -69,8 +54,19 @@ const RideDashboard = ({ rides }) => {
         setIsRidePaused(false);
     };
 
-    const endRide = () => {
-        setActiveRide(null);
+    const endRide = async (elapsedTime) => {
+        setActiveRide((prev) =>
+            prev ? { ...prev, status: "COMPLETED" } : prev
+        );
+        setUpcomingRides((prev) =>
+            prev.filter((ride) => ride.id !== activeRide.id)
+        );
+        setPastRides((prev) => [...prev, activeRide]);
+        await axios.patch("/api/update-ride-status", {
+            rideID: activeRide.id,
+            status: "COMPLETED",
+            elapsedTime,
+        });
         setIsRidePaused(false);
     };
 
@@ -148,7 +144,8 @@ const RideDashboard = ({ rides }) => {
                                                     variant="outline"
                                                     size="sm"
                                                     onClick={() =>
-                                                        startRide(ride)
+                                                        // startRide(ride)
+                                                        setActiveRide(ride)
                                                     }
                                                 >
                                                     Start
@@ -195,16 +192,35 @@ const RideDashboard = ({ rides }) => {
                                         >
                                             <div>
                                                 <p className="font-semibold">
-                                                    {ride.date} at {ride.time}
+                                                    {
+                                                        new Date(
+                                                            ride.scheduledFor
+                                                        )
+                                                            .toISOString()
+                                                            .split("T")[0]
+                                                    }{" "}
+                                                    at{" "}
+                                                    {new Date(ride.scheduledFor)
+                                                        .toISOString()
+                                                        .slice(11, 16)}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    {ride.pickup} →{" "}
-                                                    {ride.destination}
+                                                    {ride.route.from} →{" "}
+                                                    {ride.route.to}
                                                 </p>
                                             </div>
                                             <div className="flex items-center space-x-2">
                                                 <span className="font-semibold">
-                                                    <Badge>COMPLETED</Badge>
+                                                    <Badge
+                                                        variant="secondary"
+                                                        className={`${
+                                                            statusColors[
+                                                                ride.status
+                                                            ]
+                                                        } uppercase`}
+                                                    >
+                                                        {ride.status}
+                                                    </Badge>
                                                 </span>
                                                 {expandedPastRide ===
                                                 ride.id ? (
@@ -258,8 +274,13 @@ const RideDashboard = ({ rides }) => {
                 </Card>
             </div>
 
-            
-            {activeRide && <RideMiniplayer ride={activeRide} />}
+            {activeRide && (
+                <RideMiniplayer
+                    activeRide={activeRide}
+                    startRide={startRide}
+                    endRide={endRide}
+                />
+            )}
         </TabsContent>
     );
 };
