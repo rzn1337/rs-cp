@@ -32,6 +32,7 @@ import ManageRideDialog from "@/components/ManageRideDialog";
 import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import RideMiniplayer from "./RideMiniplayer";
 
 const RideDashboard = ({ rides }) => {
     const [expandedPastRide, setExpandedPastRide] = useState<number | null>(
@@ -321,7 +322,7 @@ const RideDashboard = ({ rides }) => {
                 </Card>
             </div>
 
-            {activeRide && (
+            {/* {activeRide && (
                 <div className="fixed bottom-0 left-10 right-0 bg-background border-t p-4 flex justify-between items-center">
                     <div>
                         <p className="font-semibold">Active Ride</p>
@@ -352,7 +353,9 @@ const RideDashboard = ({ rides }) => {
                         </Button>
                     </div>
                 </div>
-            )}
+            )} */}
+
+            {activeRide && <RideMiniplayer />}
         </TabsContent>
     );
 };

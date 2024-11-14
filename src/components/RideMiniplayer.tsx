@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ChevronUp, ChevronDown, Phone, MessageSquare, AlertTriangle, X, Play, Pause, StopCircle } from 'lucide-react'
 
-export default function RideMiniplayer() {
+export default function RideMiniplayer(startRide, pauseRide, endRide) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
   const [rideStatus, setRideStatus] = useState('En route to pickup')
