@@ -306,10 +306,15 @@ export default function MyRidesCalendar() {
 
     const handleSubmitComplaint = () => {
         setConfirmMessage("Are you sure you want to submit this complaint?");
-        setConfirmAction(() => () => {
-            // In a real application, you would submit this complaint to an API
+        setConfirmAction(() => async () => {
+            const response = await axios.post("/api/create-complaint", {
+                rideID: selectedRide.id,
+                complaineeID: selectedRide.driverID,
+                subject: complaintCategory,
+                description: complaintComment,
+            });
             console.log(
-                `Submitting complaint: Category: ${complaintCategory}, Comment: ${complaintComment}`
+                response
             );
             setComplaintCategory(null);
             setComplaintComment("");
