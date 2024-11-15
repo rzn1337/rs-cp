@@ -487,7 +487,7 @@ export default function MyRidesCalendar() {
                                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                                                                 <div className="flex items-center space-x-2">
                                                                     <Clock className="h-5 w-5 text-gray-400" />
-                                                                    <span className="text-lg font-medium">
+                                                                    <span className="font-bold">
                                                                         {new Date(
                                                                             "2024-11-09T16:56:00.000Z"
                                                                         ).toLocaleTimeString(
@@ -726,7 +726,7 @@ export default function MyRidesCalendar() {
                                         variant="destructive"
                                         onClick={handleCancelRide}
                                     >
-                                        Cancel Ride
+                                        Cancel Booking
                                     </Button>
                                 )}
                                 <Button

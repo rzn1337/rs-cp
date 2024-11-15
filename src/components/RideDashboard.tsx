@@ -36,6 +36,7 @@ const RideDashboard = ({ rides }) => {
         const pastRidesList = rides.filter(
             (ride) => ride.status !== "SCHEDULED"
         );
+        console.log(pastRides);
 
         setUpcomingRides(scheduledRides);
         setPastRides(pastRidesList);
@@ -61,7 +62,11 @@ const RideDashboard = ({ rides }) => {
         setUpcomingRides((prev) =>
             prev.filter((ride) => ride.id !== activeRide.id)
         );
-        setPastRides((prev) => [...prev, activeRide]);
+
+        setPastRides((prev) => [
+            ...prev,
+            { ...activeRide, status: "COMPLETED" },
+        ]);
         await axios.patch("/api/update-ride-status", {
             rideID: activeRide.id,
             status: "COMPLETED",
@@ -242,7 +247,14 @@ const RideDashboard = ({ rides }) => {
                                                     <strong>
                                                         Total Earnings:
                                                     </strong>{" "}
-                                                    ${ride.earnings}
+                                                    $
+                                                    {ride.bookings.reduce(
+                                                        (total, booking) =>
+                                                            (total +=
+                                                                booking.farePaid),
+
+                                                        0
+                                                    )}
                                                 </p>
                                                 <div className="mt-2 flex items-center">
                                                     <span className="mr-2">
