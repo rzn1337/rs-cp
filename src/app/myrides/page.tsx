@@ -48,6 +48,7 @@ import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { Separator } from "@/components/ui/separator";
 import ViewRideDialog from "@/components/ViewRideDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const StarRating = ({
     rating,
@@ -214,6 +215,7 @@ export default function MyRidesCalendar() {
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
     const [confirmMessage, setConfirmMessage] = useState("");
+    const { toast } = useToast();
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
@@ -232,9 +234,22 @@ export default function MyRidesCalendar() {
 
     const handleCancelRide = () => {
         setConfirmMessage("Are you sure you want to cancel this ride?");
-        setConfirmAction(() => () => {
-            // In a real application, you would call an API to cancel the ride
-            console.log(`Cancelling ride with ID: ${selectedRide?.id}`);
+        setConfirmAction(() => async () => {
+            await axios.post("/api/cancel-booking", {
+                rideID: selectedRide.id,
+            });
+            toast({ title: "Booking cancelled successfully" });
+            const newRidesForSelectedDate = selectedDateRides.filter(
+                (ride) => ride.id !== selectedRide.id
+            );
+            const dateKey = new Date(selectedRide.scheduledFor)
+                .toISOString()
+                .split("T")[0];
+            setBookingsByDate((prev) => ({
+                ...prev,
+                [dateKey]: newRidesForSelectedDate,
+            }));
+            console.log(format(selectedDate, "MMMM d, yyyy"));
             setSelectedRide(null);
             setIsConfirmDialogOpen(false);
         });
@@ -331,8 +346,7 @@ export default function MyRidesCalendar() {
             .filter(
                 (ride) =>
                     ride.status === "SCHEDULED" &&
-                new Date(ride.scheduledFor)
-                 >= today
+                    new Date(ride.scheduledFor) >= today
             )
             .sort(
                 (a, b) =>
@@ -606,7 +620,9 @@ export default function MyRidesCalendar() {
                                         <Card
                                             key={ride.id}
                                             className={
-                                                isToday(parseISO(ride.scheduledFor))
+                                                isToday(
+                                                    parseISO(ride.scheduledFor)
+                                                )
                                                     ? "border-blue-500 border-2"
                                                     : ""
                                             }

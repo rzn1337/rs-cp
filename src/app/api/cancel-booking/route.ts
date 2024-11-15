@@ -24,8 +24,7 @@ export async function POST(request: NextRequest) {
 
         const response = NextResponse.json(
             {
-                message: "Bookings fetched successfully",
-                data: bookings,
+                message: "Booking cancelled successfully",
                 success: true,
             },
             { status: 200 }
