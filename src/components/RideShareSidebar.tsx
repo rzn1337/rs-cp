@@ -61,8 +61,9 @@ import {
     Award,
     User2,
     CarFront,
-    Briefcase
+    Briefcase,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const data = {
     accounts: [
@@ -75,7 +76,7 @@ const data = {
             name: "Business",
             logo: Briefcase,
             plan: "Corporate",
-        }
+        },
     ],
     navMain: [
         {
@@ -184,6 +185,12 @@ export default function RideshareSidebar() {
     const [activeItem, setActiveItem] = useState("rides");
     const [activeAccount, setActiveAccount] = useState(data.accounts[0]);
     const [user, setUser] = useState(null);
+    const router = useRouter();
+
+    const handleLogOut = async () => {
+        await axios.get("/api/sign-out");
+        router.replace("/")
+    };
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -231,7 +238,9 @@ export default function RideshareSidebar() {
                                     {data.accounts.map((account, index) => (
                                         <DropdownMenuItem
                                             key={account.name}
-                                            onClick={() => setActiveAccount(account)}
+                                            onClick={() =>
+                                                setActiveAccount(account)
+                                            }
                                             className="gap-2 p-2"
                                         >
                                             <div className="flex size-6 items-center justify-center rounded-sm border">
@@ -278,8 +287,16 @@ export default function RideshareSidebar() {
                                                         <SidebarMenuSubButton
                                                             asChild
                                                         >
-                                                            <a href={subItem.url}>
-                                                                <span>{subItem.title}</span>
+                                                            <a
+                                                                href={
+                                                                    subItem.url
+                                                                }
+                                                            >
+                                                                <span>
+                                                                    {
+                                                                        subItem.title
+                                                                    }
+                                                                </span>
                                                             </a>
                                                         </SidebarMenuSubButton>
                                                     </SidebarMenuSubItem>
@@ -306,7 +323,9 @@ export default function RideshareSidebar() {
                                         <DropdownMenuTrigger asChild>
                                             <SidebarMenuAction showOnHover>
                                                 <MoreHorizontal />
-                                                <span className="sr-only">More</span>
+                                                <span className="sr-only">
+                                                    More
+                                                </span>
                                             </SidebarMenuAction>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent
@@ -355,7 +374,7 @@ export default function RideshareSidebar() {
                                                 alt={user?.username}
                                             />
                                             <AvatarFallback className="rounded-lg">
-                                            <User2 className="h-4 w-4" />
+                                                <User2 className="h-4 w-4" />
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="grid flex-1 text-left text-sm leading-tight">
@@ -377,15 +396,15 @@ export default function RideshareSidebar() {
                                 >
                                     <DropdownMenuLabel className="p-0 font-normal">
                                         <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                        <Avatar className="h-8 w-8 rounded-lg">
-                                            <AvatarImage
-                                                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${user?.username}`}
-                                                alt={user?.username}
-                                            />
-                                            <AvatarFallback className="rounded-lg">
-                                            <User2 className="h-4 w-4" />
-                                            </AvatarFallback>
-                                        </Avatar>
+                                            <Avatar className="h-8 w-8 rounded-lg">
+                                                <AvatarImage
+                                                    src={`https://api.dicebear.com/9.x/notionists/svg?seed=${user?.username}`}
+                                                    alt={user?.username}
+                                                />
+                                                <AvatarFallback className="rounded-lg">
+                                                    <User2 className="h-4 w-4" />
+                                                </AvatarFallback>
+                                            </Avatar>
                                             <div className="grid flex-1 text-left text-sm leading-tight">
                                                 <span className="truncate font-semibold">
                                                     {user?.username}
@@ -419,7 +438,7 @@ export default function RideshareSidebar() {
                                         </DropdownMenuItem>
                                     </DropdownMenuGroup>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem onClick={handleLogOut}>
                                         <LogOut />
                                         Log out
                                     </DropdownMenuItem>

@@ -247,7 +247,7 @@ export default function AdminDashboard() {
                                             }
                                         >
                                             <TableCell className="font-medium">
-                                                {complaint.id}
+                                                {complaint.altID}
                                             </TableCell>
                                             <TableCell>
                                                 {
@@ -271,18 +271,9 @@ export default function AdminDashboard() {
                                                 <Badge
                                                     variant={
                                                         complaint.status ===
-                                                        "New"
-                                                            ? "default"
-                                                            : complaint.status ===
-                                                              "In Review"
-                                                            ? "secondary"
-                                                            : complaint.status ===
-                                                              "Escalated"
+                                                        "PENDING"
                                                             ? "destructive"
-                                                            : complaint.status ===
-                                                              "Resolved"
-                                                            ? "success"
-                                                            : "outline"
+                                                            : "default"
                                                     }
                                                 >
                                                     {complaint.status}
