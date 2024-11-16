@@ -132,6 +132,7 @@ model Route {
 
 model Complaint {
   id            String          @id @default(cuid())
+  altID         String          @unique
   subject       String
   description   String?
   complaineeID  String

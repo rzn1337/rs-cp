@@ -9,15 +9,19 @@ export async function POST(request: NextRequest) {
 
         const userID = (await getTokenData(request)) as string;
 
+        const complaintCount = await prisma.complaint.count();
+        const altID = `C${complaintCount + 1}`;
+
         const complaint = await prisma.complaint.create({
             data: {
                 subject,
+                altID,
                 description,
                 complainantID: userID,
                 rideID,
                 complaineeID,
             },
-        }); 
+        });
 
         return NextResponse.json(
             {
