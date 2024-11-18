@@ -139,6 +139,7 @@ model Complaint {
   complainantID String
   createdAt     DateTime        @default(now())
   rideID        String
+  adminNote     String?
   status        ComplaintStatus @default(PENDING)
   complainee    User            @relation("ComplaineeComplaints", fields: [complaineeID], references: [id])
   complainant   User            @relation("ComplainantComplaints", fields: [complainantID], references: [id])

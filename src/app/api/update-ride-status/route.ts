@@ -23,15 +23,13 @@ export async function PATCH(request: NextRequest) {
             ride = await prisma.ride.update({
                 where: { id: rideID },
                 data: { status, elapsedTime },
-            }); 
+            });
         } else {
             ride = await prisma.ride.update({
                 where: { id: rideID },
                 data: { status },
             });
         }
-
-        
 
         if (!ride) {
             return NextResponse.json(

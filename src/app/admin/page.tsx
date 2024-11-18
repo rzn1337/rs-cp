@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import { ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
@@ -9,9 +15,17 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
     Select,
     SelectContent,
@@ -128,6 +142,18 @@ export default function AdminDashboard() {
         to: addDays(new Date(2023, 5, 20), 20),
     });
     const [complaints, setComplaints] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
+    const [isResolveDialogOpen, setIsResolveDialogOpen] = useState(false);
+    const [isDismissDialogOpen, setIsDismissDialogOpen] = useState(false);
+
+    const handleViewComplaintDetails = (complaint) => {
+        setSelectedComplaint(complaint);
+        setIsOpen(true);
+    };
+
+    const handleResolveComplaint = () => {};
+
+    const handleDismissComplaint = () => {};
 
     useEffect(() => {
         const fetchComplaints = async () => {
@@ -240,12 +266,7 @@ export default function AdminDashboard() {
                                 </TableHeader>
                                 <TableBody>
                                     {complaints.map((complaint) => (
-                                        <TableRow
-                                            key={complaint.id}
-                                            onClick={() =>
-                                                setSelectedComplaint(complaint)
-                                            }
-                                        >
+                                        <TableRow key={complaint.id}>
                                             <TableCell className="font-medium">
                                                 {complaint.altID}
                                             </TableCell>
@@ -299,7 +320,13 @@ export default function AdminDashboard() {
                                                         <DropdownMenuLabel>
                                                             Actions
                                                         </DropdownMenuLabel>
-                                                        <DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={() =>
+                                                                handleViewComplaintDetails(
+                                                                    complaint
+                                                                )
+                                                            }
+                                                        >
                                                             View details
                                                         </DropdownMenuItem>
 
@@ -632,7 +659,7 @@ export default function AdminDashboard() {
                     </Card>
                 </TabsContent>
             </Tabs>
-            {selectedComplaint && (
+            {/* {selectedComplaint && (
                 <div className="w-full lg:w-1/3 bg-white p-4 rounded-lg shadow">
                     <h2 className="text-xl font-semibold mb-4">
                         Case Details: {selectedComplaint}
@@ -712,7 +739,133 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="outline">View Complaint</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center justify-between">
+                            <span className="text-2xl font-bold">
+                                Complaint Details
+                            </span>
+                            <div className="flex items-center space-x-4">
+                                <span className="text-xl font-semibold">
+                                    C1
+                                </span>
+                                <span className="rounded-full bg-yellow-200 px-3 py-1 text-sm font-medium text-yellow-800">
+                                    PENDING
+                                </span>
+                            </div>
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    <div className="space-y-6 py-4">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Basic Information</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grid gap-4">
+                                <div>
+                                    <strong>Subject:</strong> Unsafe Driving
+                                </div>
+                                <div>
+                                    <strong>Description:</strong> rash driving
+                                </div>
+                                <div>
+                                    <strong>Date Reported:</strong> November 16,
+                                    2024
+                                </div>
+                                <div>
+                                    <strong>Related Ride ID:</strong>{" "}
+                                    {selectedComplaint?.altID}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="ml-2"
+                                    >
+                                        View Ride Details
+                                        <ExternalLink className="ml-2 h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Admin Notes</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <Textarea
+                                    placeholder="Add optional notes here..."
+                                    rows={4}
+                                />
+                            </CardContent>
+                        </Card>
+
+                        <div className="flex justify-end space-x-4">
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsDismissDialogOpen(true)}
+                            >
+                                Dismiss Complaint
+                            </Button>
+                            <Button
+                                onClick={() => setIsResolveDialogOpen(true)}
+                            >
+                                Resolve Complaint
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+
+                <AlertDialog
+                    open={isResolveDialogOpen}
+                    onOpenChange={setIsResolveDialogOpen}
+                >
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Are you sure you want to resolve this complaint?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action is final and cannot be undone. The
+                                complaint will be marked as resolved.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleResolveComplaint}>
+                                Resolve Complaint
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+
+                <AlertDialog
+                    open={isDismissDialogOpen}
+                    onOpenChange={setIsDismissDialogOpen}
+                >
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Are you sure you want to dismiss this complaint?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action is final and cannot be undone. The
+                                complaint will be marked as dismissed.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDismissComplaint}>
+                                Dismiss Complaint
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            </Dialog>
         </div>
     );
 }
