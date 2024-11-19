@@ -2,13 +2,15 @@ import { getTokenData } from "@/app/helpers/getTokenData";
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function PATCH(request: NextRequest) {
     try {
         const body = await request.json();
-        const { complainantID, status, adminNote } = body;
+        const { complaintID, status, adminNote } = body;
+
+        console.log(body);
 
         const updatedComplaint = await prisma.complaint.update({
-            where: { id: complainantID },
+            where: { id: complaintID },
             data: { status, adminNote },
         });
 

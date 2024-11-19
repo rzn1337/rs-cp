@@ -80,23 +80,13 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { addDays, toDate } from "date-fns";
+import { addDays } from "date-fns";
 import axios from "axios";
 
 const statsData = [
     { name: "Active Users", value: 5280, icon: Users },
     { name: "Active Rides", value: 22350, icon: Car },
     { name: "Today's Rides", value: 12350, icon: Users },
-];
-
-const rideData = [
-    { name: "Mon", rides: 400 },
-    { name: "Tue", rides: 300 },
-    { name: "Wed", rides: 520 },
-    { name: "Thu", rides: 400 },
-    { name: "Fri", rides: 700 },
-    { name: "Sat", rides: 600 },
-    { name: "Sun", rides: 380 },
 ];
 
 const tickets = [
@@ -135,8 +125,6 @@ const users = [
 ];
 
 export default function AdminDashboard() {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [filteredUsers, setFilteredUsers] = useState(users);
     const [date, setDate] = useState<DateRange | undefined>({
         from: new Date(2023, 5, 20),
         to: addDays(new Date(2023, 5, 20), 20),
@@ -145,13 +133,51 @@ export default function AdminDashboard() {
     const [isOpen, setIsOpen] = useState(false);
     const [isResolveDialogOpen, setIsResolveDialogOpen] = useState(false);
     const [isDismissDialogOpen, setIsDismissDialogOpen] = useState(false);
+    const [adminNote, setAdminNote] = useState("");
 
     const handleViewComplaintDetails = (complaint) => {
         setSelectedComplaint(complaint);
         setIsOpen(true);
     };
 
-    const handleResolveComplaint = () => {};
+    const handleAdminNoteChange = (note) => {
+        setAdminNote(note);
+    };
+
+    const handleResolveComplaint = async () => {
+        console.log(selectedComplaint);
+        console.log(adminNote);
+        const data = {
+            complaintID: selectedComplaint.id,
+            status: "RESOLVED",
+            adminNote,
+        };
+        try {
+            const response = await axios.patch(
+                "/api/update-complaint-status",
+                data
+            );
+            const updatedComplaint = {
+                ...selectedComplaint,
+                status: "RESOLVED",
+                adminNote,
+            };
+
+            setComplaints((prev) =>
+                prev.map((complaint) =>
+                    complaint.id === updatedComplaint.id
+                        ? updatedComplaint
+                        : complaint
+                )
+            );
+        } catch (error) {
+            console.error(error.message);
+        } finally {
+            setAdminNote("");
+            setIsOpen(false);
+            setSelectedComplaint(null);
+        }
+    };
 
     const handleDismissComplaint = () => {};
 
@@ -540,11 +566,11 @@ export default function AdminDashboard() {
                                                                 >
                                                                     Response
                                                                 </Label>
-                                                                <Textarea
+                                                                {/* <Textarea
                                                                     id="ticket-response"
                                                                     placeholder="Enter your response"
                                                                     className="col-span-3"
-                                                                />
+                                                                /> */}
                                                             </div>
                                                         </div>
                                                         <div className="flex justify-end">
@@ -574,7 +600,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center space-x-2 mb-4">
                                 <Input
                                     placeholder="Search users..."
-                                    value={searchQuery}
+                                    // value={searchQuery}
                                     onChange={(e) =>
                                         handleSearch(e.target.value)
                                     }
@@ -599,7 +625,7 @@ export default function AdminDashboard() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {filteredUsers.map((user) => (
+                                    {/* {filteredUsers.map((user) => (
                                         <TableRow key={user.id}>
                                             <TableCell>{user.id}</TableCell>
                                             <TableCell>{user.name}</TableCell>
@@ -652,7 +678,7 @@ export default function AdminDashboard() {
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    ))} */}
                                 </TableBody>
                             </Table>
                         </CardContent>
@@ -740,132 +766,190 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             )} */}
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogTrigger asChild>
-                    <Button variant="outline">View Complaint</Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center justify-between">
-                            <span className="text-2xl font-bold">
-                                Complaint Details
-                            </span>
-                            <div className="flex items-center space-x-4">
-                                <span className="text-xl font-semibold">
-                                    C1
-                                </span>
-                                <span className="rounded-full bg-yellow-200 px-3 py-1 text-sm font-medium text-yellow-800">
-                                    PENDING
-                                </span>
+            {selectedComplaint && (
+                <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                    <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader className="p-4">
+                            <DialogTitle>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-2xl font-bold tracking-tight">
+                                        Complaint Details
+                                    </span>
+                                    <div className="flex items-center gap-4">
+                                        {/* <span className="text-xl font-semibold text-gray-700">
+                                        C1
+                                    </span> */}
+                                        <Badge
+                                            variant={
+                                                selectedComplaint?.status ===
+                                                "PENDING"
+                                                    ? "destructive"
+                                                    : "default"
+                                            }
+                                        >
+                                            {selectedComplaint?.status}
+                                        </Badge>
+                                    </div>
+                                </div>
+                            </DialogTitle>
+                        </DialogHeader>
+
+                        <div className="space-y-8">
+                            <Card className="border-gray-200">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-lg font-semibold text-gray-800">
+                                        Basic Information
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="grid gap-6">
+                                    <div className="grid gap-4">
+                                        <div className="flex items-center">
+                                            <span className="font-medium text-gray-700 min-w-[120px]">
+                                                Related Ride ID:
+                                            </span>
+                                            <span>
+                                                {selectedComplaint?.altID}
+                                            </span>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="ml-4 text-gray-600 hover:text-gray-900"
+                                            >
+                                                View Ride Details
+                                                <ExternalLink className="ml-2 h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                        <div className="flex items-start">
+                                            <span className="font-medium text-gray-700 min-w-[120px]">
+                                                Subject:
+                                            </span>
+                                            <span>
+                                                {selectedComplaint?.subject}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-start">
+                                            <span className="font-medium text-gray-700 min-w-[120px]">
+                                                Description:
+                                            </span>
+                                            <span>
+                                                {selectedComplaint?.description}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-start">
+                                            <span className="font-medium text-gray-700 min-w-[120px]">
+                                                Date Reported:
+                                            </span>
+                                            <span>
+                                                {
+                                                    new Date(
+                                                        selectedComplaint?.createdAt
+                                                    )
+                                                        .toISOString()
+                                                        .split("T")[0]
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="border-gray-200">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-lg font-semibold text-gray-800">
+                                        Admin Notes
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <Textarea
+                                        id="ticket-response"
+                                        placeholder="Enter your response"
+                                        value={adminNote}
+                                        onChange={(e) =>
+                                            handleAdminNoteChange(
+                                                e.target.value
+                                            )
+                                        }
+                                        className="mt-2 w-full"
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <div className="flex justify-end gap-4 pt-4">
+                                <Button
+                                    variant="outline"
+                                    className="px-6"
+                                    onClick={() => setIsDismissDialogOpen(true)}
+                                >
+                                    Dismiss Complaint
+                                </Button>
+                                <Button
+                                    className="px-6"
+                                    onClick={() => setIsResolveDialogOpen(true)}
+                                >
+                                    Resolve Complaint
+                                </Button>
                             </div>
-                        </DialogTitle>
-                    </DialogHeader>
-
-                    <div className="space-y-6 py-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Basic Information</CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid gap-4">
-                                <div>
-                                    <strong>Subject:</strong> Unsafe Driving
-                                </div>
-                                <div>
-                                    <strong>Description:</strong> rash driving
-                                </div>
-                                <div>
-                                    <strong>Date Reported:</strong> November 16,
-                                    2024
-                                </div>
-                                <div>
-                                    <strong>Related Ride ID:</strong>{" "}
-                                    {selectedComplaint?.altID}
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="ml-2"
-                                    >
-                                        View Ride Details
-                                        <ExternalLink className="ml-2 h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Admin Notes</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <Textarea
-                                    placeholder="Add optional notes here..."
-                                    rows={4}
-                                />
-                            </CardContent>
-                        </Card>
-
-                        <div className="flex justify-end space-x-4">
-                            <Button
-                                variant="outline"
-                                onClick={() => setIsDismissDialogOpen(true)}
-                            >
-                                Dismiss Complaint
-                            </Button>
-                            <Button
-                                onClick={() => setIsResolveDialogOpen(true)}
-                            >
-                                Resolve Complaint
-                            </Button>
                         </div>
-                    </div>
-                </DialogContent>
+                    </DialogContent>
 
-                <AlertDialog
-                    open={isResolveDialogOpen}
-                    onOpenChange={setIsResolveDialogOpen}
-                >
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>
-                                Are you sure you want to resolve this complaint?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action is final and cannot be undone. The
-                                complaint will be marked as resolved.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleResolveComplaint}>
-                                Resolve Complaint
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                    <AlertDialog
+                        open={isResolveDialogOpen}
+                        onOpenChange={setIsResolveDialogOpen}
+                    >
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle className="text-xl font-semibold">
+                                    Are you sure you want to resolve this
+                                    complaint?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription className="text-gray-600">
+                                    This action is final and cannot be undone.
+                                    The complaint will be marked as resolved.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter className="gap-3">
+                                <AlertDialogCancel className="border-gray-200">
+                                    Cancel
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={handleResolveComplaint}
+                                >
+                                    Resolve Complaint
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
 
-                <AlertDialog
-                    open={isDismissDialogOpen}
-                    onOpenChange={setIsDismissDialogOpen}
-                >
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>
-                                Are you sure you want to dismiss this complaint?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action is final and cannot be undone. The
-                                complaint will be marked as dismissed.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDismissComplaint}>
-                                Dismiss Complaint
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            </Dialog>
+                    <AlertDialog
+                        open={isDismissDialogOpen}
+                        onOpenChange={setIsDismissDialogOpen}
+                    >
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle className="text-xl font-semibold">
+                                    Are you sure you want to dismiss this
+                                    complaint?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription className="text-gray-600">
+                                    This action is final and cannot be undone.
+                                    The complaint will be marked as dismissed.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter className="gap-3">
+                                <AlertDialogCancel className="border-gray-200">
+                                    Cancel
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={handleDismissComplaint}
+                                >
+                                    Dismiss Complaint
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </Dialog>
+            )}
         </div>
     );
 }
