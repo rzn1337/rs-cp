@@ -235,10 +235,10 @@ const CreateRideTab = ({ setRides }) => {
                             <div>
                                 <div className="relative">
                                     <Label htmlFor="vehicle">Vehicle</Label>
-                                    <CarFront
+                                    {/* <CarFront
                                         className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
                                         size={16}
-                                    />
+                                    /> */}
                                     <Select
                                         value={newRide.vehicleID}
                                         onValueChange={(value) =>
@@ -293,7 +293,7 @@ const CreateRideTab = ({ setRides }) => {
                                         stops: e.target.value,
                                     })
                                 }
-                                placeholder="Add stops (comma-separated), Feature coming soon..."
+                                placeholder="Add stops (comma-separated)"
                                 className="pl-8"
                             />
                         </div>

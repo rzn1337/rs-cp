@@ -93,10 +93,6 @@ const data = {
                     title: "Create a New Ride",
                     url: "/ride-management",
                 },
-                {
-                    title: "Favorites",
-                    url: "#",
-                },
             ],
         },
         {
@@ -109,31 +105,8 @@ const data = {
                     url: "/myrides",
                 },
                 {
-                    title: "Receipts",
-                    url: "#",
-                },
-                {
-                    title: "Reviews",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Payments",
-            url: "#",
-            icon: Wallet,
-            items: [
-                {
-                    title: "Payment Methods",
-                    url: "#",
-                },
-                {
-                    title: "Ride Credits",
-                    url: "#",
-                },
-                {
-                    title: "Billing History",
-                    url: "#",
+                    title: "Recent Complaints",
+                    url: "/mycomplaints",
                 },
             ],
         },
@@ -189,7 +162,7 @@ export default function RideshareSidebar() {
 
     const handleLogOut = async () => {
         await axios.get("/api/sign-out");
-        router.replace("/")
+        router.replace("/");
     };
 
     useEffect(() => {

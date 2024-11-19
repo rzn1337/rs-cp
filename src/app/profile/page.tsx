@@ -148,6 +148,7 @@ export default function UserProfile() {
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [user, setUser] = useState(null);
 
     const handleEdit = (updatedVehicle: Vehicle) => {
         // Placeholder for edit functionality
@@ -209,6 +210,12 @@ export default function UserProfile() {
             console.log(response);
             setVehicles(response.data.data);
         };
+        const fetchUser = async () => {
+            const response = await axios.get("/api/get-user");
+            console.log(response);
+            setUser(response.data.data);
+        };
+        fetchUser();
         fetchVehicles();
     }, []);
     const [hoveredDay, setHoveredDay] = useState(null);
@@ -252,18 +259,13 @@ export default function UserProfile() {
         <div className="container mx-auto px-4 py-8">
             <header className="flex items-center gap-4 mb-8">
                 <img
-                    src={`https://api.dicebear.com/9.x/notionists/svg?seed=abcd`}
-                    alt={`abcd`}
+                    src={`https://api.dicebear.com/9.x/notionists/svg?seed=${user?.username}`}
+                    alt={`${user?.username}`}
                     className="w-24 h-24 rounded-full object-cover"
                 />
                 <div>
                     <h1 className="text-2xl font-bold">John Doe</h1>
-                    <div className="flex items-center">
-                        <span className="text-yellow-400">★★★★☆</span>
-                        <span className="ml-2 text-sm text-gray-600">
-                            4.5 (120 rides)
-                        </span>
-                    </div>
+                    <div className="flex items-center"></div>
                 </div>
             </header>
 
@@ -284,7 +286,7 @@ export default function UserProfile() {
                 </TabsList>
 
                 <TabsContent value="trip-history">
-                    <Card>
+                    {/* <Card>
                         <CardHeader>
                             <CardTitle>Trip History</CardTitle>
                             <CardDescription>
@@ -305,7 +307,11 @@ export default function UserProfile() {
                                 </span>
                             </div>
                         </CardContent>
-                    </Card>
+                    </Card> */}
+                    TODO: 
+                    -> Fix this component.
+                    -> Add a page for user to view their complaints
+                    
                 </TabsContent>
                 <TabsContent value="payment-methods">
                     <Card>
