@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { ExternalLink } from "lucide-react";
+import { CarFront, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -133,7 +133,9 @@ export default function AdminDashboard() {
     const [isOpen, setIsOpen] = useState(false);
     const [isResolveDialogOpen, setIsResolveDialogOpen] = useState(false);
     const [isDismissDialogOpen, setIsDismissDialogOpen] = useState(false);
+    const [selectedComplaint, setSelectedComplaint] = useState(null);
     const [adminNote, setAdminNote] = useState("");
+    const [adminStats, setAdminStats] = useState(null);
 
     const handleViewComplaintDetails = (complaint) => {
         setSelectedComplaint(complaint);
@@ -145,8 +147,6 @@ export default function AdminDashboard() {
     };
 
     const handleResolveComplaint = async () => {
-        console.log(selectedComplaint);
-        console.log(adminNote);
         const data = {
             complaintID: selectedComplaint.id,
             status: "RESOLVED",
@@ -179,7 +179,38 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleDismissComplaint = () => {};
+    const handleDismissComplaint = async () => {
+        const data = {
+            complaintID: selectedComplaint.id,
+            status: "DISMISSED",
+            adminNote,
+        };
+        try {
+            const response = await axios.patch(
+                "/api/update-complaint-status",
+                data
+            );
+            const updatedComplaint = {
+                ...selectedComplaint,
+                status: "DISMISSED",
+                adminNote,
+            };
+
+            setComplaints((prev) =>
+                prev.map((complaint) =>
+                    complaint.id === updatedComplaint.id
+                        ? updatedComplaint
+                        : complaint
+                )
+            );
+        } catch (error) {
+            console.error(error.message);
+        } finally {
+            setAdminNote("");
+            setIsOpen(false);
+            setSelectedComplaint(null);
+        }
+    };
 
     useEffect(() => {
         const fetchComplaints = async () => {
@@ -187,6 +218,10 @@ export default function AdminDashboard() {
                 const response = await axios.get("/api/get-complaints");
                 console.log(response);
                 setComplaints(response.data.data);
+                const adminStatsResponse = await axios.get(
+                    "/api/get-admin-stats"
+                );
+                setAdminStats(adminStatsResponse.data.data);
             } catch (error) {
                 console.error(error);
             }
@@ -216,7 +251,7 @@ export default function AdminDashboard() {
             )
         );
     };
-    const [selectedComplaint, setSelectedComplaint] = useState(null);
+
     const [selectedTicket, setSelectedTicket] = useState(null);
 
     return (
@@ -226,21 +261,46 @@ export default function AdminDashboard() {
             </h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {statsData.map((stat, index) => (
-                    <Card key={index}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                {stat.name}
-                            </CardTitle>
-                            <stat.icon className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {stat.value.toLocaleString()}
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Active Users
+                        </CardTitle>
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">
+                            {adminStats?.activeUsersCount}
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Total Rides
+                        </CardTitle>
+                        <CarFront className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">
+                            {adminStats?.totalRidesCount}
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            New Users
+                        </CardTitle>
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">
+                            {adminStats?.newUsersCount}
+                        </div>
+                    </CardContent>
+                </Card>
+
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
