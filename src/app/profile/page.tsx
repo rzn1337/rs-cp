@@ -781,7 +781,9 @@ export default function UserProfile() {
                     </Avatar>
                     <div>
                         <h1 className="text-3xl font-bold">{userData?.name}</h1>
-                        <p className="text-muted-foreground text-sm">@{userData?.username}</p>
+                        <p className="text-muted-foreground text-sm">
+                            @ {userData?.username}
+                        </p>
                         <p className="text-sm text-muted-foreground">
                             <CalendarIcon className="inline mr-1 w-4 h-4" />
                             Joined {userData?.createdAt.split("T")[0]}
