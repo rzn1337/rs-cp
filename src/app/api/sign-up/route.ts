@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export async function POST(request: Request) {
     const body = await request.json();
-    const { username, email, password } = body;
+    const { username, email, password, name } = body;
 
     // validate email and password
     if (!validateEmail(email) || !validatePassword(password)) {
@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     // create a new user in the db
     const user = await prisma.user.create({
         data: {
+            name,
             username,
             email,
             password: hashedPassword,

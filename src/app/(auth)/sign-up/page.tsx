@@ -24,6 +24,7 @@ export default function SignUp() {
         email: "",
         password: "",
         confirmPassword: "",
+        name: "",
     });
 
     const router = useRouter();
@@ -54,6 +55,17 @@ export default function SignUp() {
                     <CardContent>
                         <form onSubmit={handleSignup}>
                             <div className="grid w-full items-center gap-4">
+                                <div className="flex flex-col space-y-1.5">
+                                    <Label htmlFor="name">Name</Label>
+                                    <Input
+                                        id="name"
+                                        name="name"
+                                        placeholder="Your name"
+                                        value={signupData.name}
+                                        onChange={handleSignupChange}
+                                        required
+                                    />
+                                </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="name">Username</Label>
                                     <Input
