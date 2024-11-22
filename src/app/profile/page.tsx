@@ -988,18 +988,33 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import AddVehicleDialog from "@/components/AddRideDialog";
+import { VehicleViewDialog } from "@/components/VehileDetailsDialog";
 
 export default function UserProfile() {
     const [userData, setUserData] = useState(null);
     const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [vehicle, setVehicle] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     useEffect(() => {
         const fetchUserProfileData = async () => {
             const response = await axios.get("/api/get-user-profile");
             setUserData(response.data.data);
+            setVehicle(response.data.data.Vehicle);
         };
         fetchUserProfileData();
     }, []);
+
+    const handleSave = (updatedVehicle) => {
+        setVehicle(updatedVehicle);
+        console.log("Vehicle updated:", updatedVehicle);
+    };
+
+    const handleDelete = (vehicleId) => {
+        console.log("Vehicle deleted:", vehicleId);
+        setIsModalOpen(false);
+    };
 
     const handleAddVehicle = async (vehicleData) => {
         try {
@@ -1008,9 +1023,10 @@ export default function UserProfile() {
                 "/api/register-vehicle",
                 vehicleData
             );
-            const vehicles = userData?.Vehicle
+            setVehicle((prev) => [...prev, response.data.data]);
+            const vehicles = userData?.Vehicle;
             vehicles.push(response.data.data);
-            setUserData(prev => prev)
+            setUserData((prev) => prev);
             // setVehicles((prev) => [...prev, response.data.data]);
             console.log(response);
         } catch (error) {
@@ -1127,27 +1143,44 @@ export default function UserProfile() {
                             <ScrollArea className="h-[200px] w-full pr-4">
                                 <div className="space-y-4">
                                     {userData?.Vehicle.map((vehicle) => (
-                                        <div
-                                            key={vehicle.id}
-                                            className="flex justify-between items-center"
-                                        >
-                                            <div>
-                                                <p className="font-semibold">
-                                                    {vehicle.make}{" "}
-                                                    {vehicle.model}{" "}
-                                                    {vehicle.year}
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    License Plate:{" "}
-                                                    {vehicle.licensePlate}
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    {vehicle._count.seats} Seats
-                                                    | {vehicle.type}
-                                                </p>
+                                        <>
+                                            <div
+                                                key={vehicle.id}
+                                                className="flex justify-between items-center"
+                                            >
+                                                <div>
+                                                    <p className="font-semibold">
+                                                        {vehicle.make}{" "}
+                                                        {vehicle.model}{" "}
+                                                        {vehicle.year}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        License Plate:{" "}
+                                                        {vehicle.licensePlate}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {vehicle._count.seats}{" "}
+                                                        Seats | {vehicle.type}
+                                                    </p>
+                                                </div>
+                                                <Button
+                                                    onClick={() =>
+                                                        setIsDialogOpen(true)
+                                                    }
+                                                >
+                                                    Open Vehicle Details
+                                                </Button>
                                             </div>
-                                            <Button>View</Button>
-                                        </div>
+                                            <VehicleViewDialog
+                                                isOpen={isDialogOpen}
+                                                onClose={() =>
+                                                    setIsDialogOpen(false)
+                                                }
+                                                vehicle={vehicle}
+                                                onSave={handleSave}
+                                                onDelete={handleDelete}
+                                            />
+                                        </>
                                     ))}
                                 </div>
                             </ScrollArea>
@@ -1165,6 +1198,7 @@ export default function UserProfile() {
                         onOpenChange={setIsAddVehicleOpen}
                         onSubmit={handleAddVehicle}
                     />
+
                     {/* Complaints Section */}
                     <Card>
                         <CardHeader>
