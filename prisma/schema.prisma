@@ -63,7 +63,7 @@ model Vehicle {
 model Seat {
   id         String    @id @default(cuid())
   vehicleID  String
-  vehicle    Vehicle   @relation(fields: [vehicleID], references: [id])
+  vehicle    Vehicle   @relation(fields: [vehicleID], references: [id], onDelete: Cascade)
   seatNumber Int // Seat position or identifier
   isPremium  Boolean   @default(false) // Marks seat as premium or not
   Booking    Booking[]

@@ -994,14 +994,13 @@ export default function UserProfile() {
     const [userData, setUserData] = useState(null);
     const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [vehicle, setVehicle] = useState(null);
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [selectedVehicle, setSelectedVehicle] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     useEffect(() => {
         const fetchUserProfileData = async () => {
             const response = await axios.get("/api/get-user-profile");
             setUserData(response.data.data);
-            setVehicle(response.data.data.Vehicle);
         };
         fetchUserProfileData();
     }, []);
@@ -1011,9 +1010,26 @@ export default function UserProfile() {
         console.log("Vehicle updated:", updatedVehicle);
     };
 
-    const handleDelete = (vehicleId) => {
-        console.log("Vehicle deleted:", vehicleId);
-        setIsModalOpen(false);
+    const handleDelete = async () => {
+        console.log(selectedVehicle);
+        try {
+            const response = await axios.delete(
+                `api/delete-vehicle/${selectedVehicle?.id}`
+            );
+            const updatedVehicles = (userData?.Vehicle || []).filter(
+                (vehicle) => vehicle.id !== selectedVehicle.id
+            );
+            setUserData((prev) => ({ ...prev, Vehicle: updatedVehicles }));
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsModalOpen(false);
+        }
+    };
+
+    const handleViewRide = (vehicle) => {
+        setSelectedVehicle(vehicle);
+        setIsDialogOpen(true);
     };
 
     const handleAddVehicle = async (vehicleData) => {
@@ -1023,10 +1039,9 @@ export default function UserProfile() {
                 "/api/register-vehicle",
                 vehicleData
             );
-            setVehicle((prev) => [...prev, response.data.data]);
-            const vehicles = userData?.Vehicle;
-            vehicles.push(response.data.data);
-            setUserData((prev) => prev);
+            const updatedVehicles = [...userData?.Vehicle, response.data.data];
+
+            setUserData((prev) => ({ ...prev, Vehicle: updatedVehicles }));
             // setVehicles((prev) => [...prev, response.data.data]);
             console.log(response);
         } catch (error) {
@@ -1165,21 +1180,12 @@ export default function UserProfile() {
                                                 </div>
                                                 <Button
                                                     onClick={() =>
-                                                        setIsDialogOpen(true)
+                                                        handleViewRide(vehicle)
                                                     }
                                                 >
                                                     Open Vehicle Details
                                                 </Button>
                                             </div>
-                                            <VehicleViewDialog
-                                                isOpen={isDialogOpen}
-                                                onClose={() =>
-                                                    setIsDialogOpen(false)
-                                                }
-                                                vehicle={vehicle}
-                                                onSave={handleSave}
-                                                onDelete={handleDelete}
-                                            />
                                         </>
                                     ))}
                                 </div>
@@ -1295,6 +1301,15 @@ export default function UserProfile() {
                     </Card>
                 </div>
             </div>
+            {selectedVehicle && (
+                <VehicleViewDialog
+                    isOpen={isDialogOpen}
+                    onClose={() => setIsDialogOpen(false)}
+                    vehicle={selectedVehicle}
+                    onSave={handleSave}
+                    onDelete={handleDelete}
+                />
+            )}
         </div>
     );
 }

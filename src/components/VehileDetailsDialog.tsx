@@ -29,13 +29,7 @@ interface Vehicle {
 }
 
 // Props for the dialog
-interface VehicleViewDialogProps {
-    isOpen: boolean;
-    onClose: () => void;
-    vehicle: Vehicle;
-    onSave: (updatedVehicle: Vehicle) => void;
-    onDelete: (vehicleId: string) => void;
-}
+
 
 export function VehicleViewDialog({
     isOpen,
@@ -43,7 +37,7 @@ export function VehicleViewDialog({
     vehicle,
     onSave,
     onDelete,
-}: VehicleViewDialogProps) {
+}) {
     // State management
     const [isEditMode, setIsEditMode] = useState(false);
     const [editedVehicle, setEditedVehicle] = useState<Vehicle>(vehicle);
@@ -69,7 +63,7 @@ export function VehicleViewDialog({
     };
 
     const confirmDelete = () => {
-        onDelete(vehicle.id);
+        onDelete();
         setIsDeleteDialogOpen(false);
         onClose();
     };
@@ -235,7 +229,7 @@ export function VehicleViewDialog({
                                 variant="destructive"
                                 onClick={handleDelete}
                             >
-                                Delete/Deregister
+                                Delete Vehicle
                             </Button>
                         </DialogFooter>
                     </>
