@@ -8,8 +8,15 @@ export async function GET(request: NextRequest) {
 
         const userData = await prisma.user.findUnique({
             where: { id: userID },
-            include: {bookedRides: {include: {seat: true, ride: {include: {route: true, vehicle: true}}}}}
-            
+            include: {
+                bookedRides: {
+                    include: {
+                        seat: true,
+                        ride: { include: { route: true, vehicle: true } },
+                    },
+                },
+                Vehicle: { include: { _count: { select: { seats: true } } } },
+            },
         });
 
         if (!userData) {

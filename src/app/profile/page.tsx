@@ -987,9 +987,11 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import AddVehicleDialog from "@/components/AddRideDialog";
 
 export default function UserProfile() {
     const [userData, setUserData] = useState(null);
+    const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
 
     useEffect(() => {
         const fetchUserProfileData = async () => {
@@ -998,6 +1000,25 @@ export default function UserProfile() {
         };
         fetchUserProfileData();
     }, []);
+
+    const handleAddVehicle = async (vehicleData) => {
+        try {
+            console.log(vehicleData);
+            const response = await axios.post(
+                "/api/register-vehicle",
+                vehicleData
+            );
+            const vehicles = userData?.Vehicle
+            vehicles.push(response.data.data);
+            setUserData(prev => prev)
+            // setVehicles((prev) => [...prev, response.data.data]);
+            console.log(response);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsAddVehicleOpen(false);
+        }
+    };
 
     return (
         <div className="container mx-auto p-4">
@@ -1105,35 +1126,45 @@ export default function UserProfile() {
                         <CardContent>
                             <ScrollArea className="h-[200px] w-full pr-4">
                                 <div className="space-y-4">
-                                    {[...Array(3)].map((_, index) => (
+                                    {userData?.Vehicle.map((vehicle) => (
                                         <div
-                                            key={index}
+                                            key={vehicle.id}
                                             className="flex justify-between items-center"
                                         >
                                             <div>
                                                 <p className="font-semibold">
-                                                    Toyota Camry {2020 + index}
+                                                    {vehicle.make}{" "}
+                                                    {vehicle.model}{" "}
+                                                    {vehicle.year}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    License Plate: ABC{" "}
-                                                    {123 + index}
+                                                    License Plate:{" "}
+                                                    {vehicle.licensePlate}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    <Badge>SEDAN</Badge> |{" "}
-                                                    {4 + index} Seats
+                                                    {vehicle._count.seats} Seats
+                                                    | {vehicle.type}
                                                 </p>
                                             </div>
-                                            <CarIcon className="w-6 h-6 text-muted-foreground" />
+                                            <Button>View</Button>
                                         </div>
                                     ))}
                                 </div>
                             </ScrollArea>
-                            <Button variant="outline" className="w-full mt-4">
+                            <Button
+                                variant="outline"
+                                className="w-full mt-4"
+                                onClick={() => setIsAddVehicleOpen(true)}
+                            >
                                 Add New Vehicle
                             </Button>
                         </CardContent>
                     </Card>
-
+                    <AddVehicleDialog
+                        isOpen={isAddVehicleOpen}
+                        onOpenChange={setIsAddVehicleOpen}
+                        onSubmit={handleAddVehicle}
+                    />
                     {/* Complaints Section */}
                     <Card>
                         <CardHeader>

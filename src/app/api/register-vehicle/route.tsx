@@ -36,23 +36,21 @@ export async function POST(request: NextRequest) {
 
         if (Array.isArray(seats) && seats.length > 0) {
             const seatsData = seats.map((seat) => ({
-              vehicleID: newVehicle.id,
-              seatNumber: seat.seatNumber,
-              isPremium: seat.isPremium || false,
+                vehicleID: newVehicle.id,
+                seatNumber: seat.seatNumber,
+                isPremium: seat.isPremium || false,
             }));
-      
+
             // Bulk insert seats
             await prisma.seat.createMany({
-              data: seatsData,
+                data: seatsData,
             });
-          }
+        }
 
-          const vehicle = await prisma.vehicle.findUnique({
+        const vehicle = await prisma.vehicle.findUnique({
             where: { id: newVehicle.id },
-            include: {
-              seats: true, // Include all associated seats
-            },
-          });
+            include: { _count: { select: { seats: true } } },
+        });
 
         const response = NextResponse.json({
             message: "Vehicle registered successfully",
