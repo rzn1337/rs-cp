@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
                     },
                 },
                 Vehicle: { include: { _count: { select: { seats: true } } } },
+                complaintsAsComplainant: {include: {complainee: true}},
             },
         });
 

@@ -1213,30 +1213,27 @@ export default function UserProfile() {
                         <CardContent>
                             <ScrollArea className="h-[200px] w-full pr-4">
                                 <div className="space-y-4">
-                                    {[...Array(4)].map((_, index) => (
+                                    {userData?.complaintsAsComplainant.map((complaint, index) => (
                                         <div
-                                            key={index}
+                                            key={complaint.id}
                                             className="flex justify-between items-center"
                                         >
                                             <div>
                                                 <p className="font-semibold">
-                                                    Complaint ID: #
-                                                    {12345 + index}
+                                                    Complaint ID: {" "}
+                                                    {complaint.altID}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    Against: Driver XYZ
+                                                    Against: {complaint.complainee.name}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
                                                     Status:{" "}
                                                     <Badge variant="outline">
-                                                        {index % 2 === 0
-                                                            ? "PENDING"
-                                                            : "RESOLVED"}
+                                                        {complaint.status}
                                                     </Badge>
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    Filed on: May {10 + index},
-                                                    2023
+                                                    Filed on: {complaint.createdAt.split("T")[0]}
                                                 </p>
                                             </div>
                                         </div>
