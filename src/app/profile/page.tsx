@@ -996,13 +996,20 @@ export default function UserProfile() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedVehicle, setSelectedVehicle] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchUserProfileData = async () => {
             const response = await axios.get("/api/get-user-profile");
             setUserData(response.data.data);
         };
-        fetchUserProfileData();
+        try {
+            fetchUserProfileData();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
     const handleSave = (updatedVehicle) => {
@@ -1051,7 +1058,7 @@ export default function UserProfile() {
         }
     };
 
-    return (
+    return isLoading ?  (<div>Loading...</div>) : (
         <div className="container mx-auto p-4">
             {/* Header Section */}
             <header className="flex justify-between items-center mb-8 p-6 bg-background rounded-lg shadow">
@@ -1213,31 +1220,42 @@ export default function UserProfile() {
                         <CardContent>
                             <ScrollArea className="h-[200px] w-full pr-4">
                                 <div className="space-y-4">
-                                    {userData?.complaintsAsComplainant.map((complaint, index) => (
-                                        <div
-                                            key={complaint.id}
-                                            className="flex justify-between items-center"
-                                        >
-                                            <div>
-                                                <p className="font-semibold">
-                                                    Complaint ID: {" "}
-                                                    {complaint.altID}
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Against: {complaint.complainee.name}
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Status:{" "}
-                                                    <Badge variant="outline">
-                                                        {complaint.status}
-                                                    </Badge>
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Filed on: {complaint.createdAt.split("T")[0]}
-                                                </p>
+                                    {userData?.complaintsAsComplainant.map(
+                                        (complaint, index) => (
+                                            <div
+                                                key={complaint.id}
+                                                className="flex justify-between items-center"
+                                            >
+                                                <div>
+                                                    <p className="font-semibold">
+                                                        Complaint ID:{" "}
+                                                        {complaint.altID}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Against:{" "}
+                                                        {
+                                                            complaint.complainee
+                                                                .name
+                                                        }
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Status:{" "}
+                                                        <Badge variant="outline">
+                                                            {complaint.status}
+                                                        </Badge>
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Filed on:{" "}
+                                                        {
+                                                            complaint.createdAt.split(
+                                                                "T"
+                                                            )[0]
+                                                        }
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    )}
                                 </div>
                             </ScrollArea>
                         </CardContent>
@@ -1257,14 +1275,14 @@ export default function UserProfile() {
                                     Total Rides Count
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    As Driver: 50 rides
+                                    As Driver: {userData?._count.Ride}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    As Passenger: 30 rides
+                                    As Passenger: {userData?._count.bookedRides}
                                 </p>
-                                <p className="text-sm text-muted-foreground">
-                                    Total Distance Traveled: 1,500 km
-                                </p>
+                                {/* <p className="text-sm text-muted-foreground">
+                                    Time Spent Riding: 1,500 km
+                                </p> */}
                             </div>
                         </CardContent>
                     </Card>
@@ -1278,12 +1296,12 @@ export default function UserProfile() {
                             <div className="space-y-2">
                                 <p className="flex items-center">
                                     <MailIcon className="w-4 h-4 mr-2" />
-                                    john.doe@example.com
+                                    {userData?.email}
                                 </p>
-                                <p className="flex items-center">
+                                {/* <p className="flex items-center">
                                     <PhoneIcon className="w-4 h-4 mr-2" />
                                     +1 (555) 123-4567
-                                </p>
+                                </p> */}
                                 <p className="flex items-center">
                                     <UserIcon className="w-4 h-4 mr-2" />
                                     Account Status: Active
