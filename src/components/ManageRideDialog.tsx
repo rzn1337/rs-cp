@@ -44,7 +44,8 @@ export default function ManageRideDialog({
     currentRide,
     // handleCancelRide,
     handleUpdateRide,
-    // handleRemovePassenger,
+    handleRemovePassenger,
+    handleManageClick
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [ride, setRide] = useState(currentRide);
@@ -74,6 +75,7 @@ export default function ManageRideDialog({
             (p) => p.id !== passenger.id
         );
         setRide((prev) => ({ ...prev, bookings: updatedBookings }));
+        handleRemovePassenger(passenger.id);
 
         // Here you would typically update the passenger list in your backend
     };
@@ -103,7 +105,7 @@ export default function ManageRideDialog({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => handleManageClick(currentRide)}>
                     Manage
                 </Button>
             </DialogTrigger>

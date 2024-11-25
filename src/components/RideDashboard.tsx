@@ -28,6 +28,7 @@ const RideDashboard = ({ rides }) => {
     const [activeRide, setActiveRide] = useState(null);
     const [isRidePaused, setIsRidePaused] = useState(false);
     const [rideTimer, setRideTimer] = useState(0);
+    const [selectedRide, setSelectedRide] = useState(null);
 
     useEffect(() => {
         const scheduledRides = rides.filter(
@@ -104,6 +105,31 @@ const RideDashboard = ({ rides }) => {
         }
     };
 
+    const handleRemovePassenger = async (bookingID) => {
+        try {
+            const response = await axios.delete(
+                `/api/delete-passenger-booking/${bookingID}`
+            );
+            const updatedBookings = selectedRide?.bookings.filter(
+                (booking) => booking.id !== bookingID
+            );
+            setUpcomingRides((prev) =>
+                prev.map((ride) =>
+                    ride.id === selectedRide.id
+                        ? { ...ride, bookings: updatedBookings }
+                        : ride
+                )
+            );
+            toast({ title: "You have cancelled a booking for your ride" });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleManageClick = (ride) => {
+        setSelectedRide(ride);
+    };
+
     return (
         <TabsContent value="ride-dashboard" className="p-4">
             <div className="space-y-6">
@@ -156,9 +182,15 @@ const RideDashboard = ({ rides }) => {
                                                     Start
                                                 </Button>
                                                 <ManageRideDialog
+                                                    handleManageClick={
+                                                        handleManageClick
+                                                    }
                                                     currentRide={ride}
                                                     handleUpdateRide={
                                                         handleUpdateRide
+                                                    }
+                                                    handleRemovePassenger={
+                                                        handleRemovePassenger
                                                     }
                                                 />
                                             </div>
