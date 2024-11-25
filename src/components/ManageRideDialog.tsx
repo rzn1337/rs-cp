@@ -40,32 +40,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
-const initialRide = {
-    id: "1",
-    date: "2024-03-15",
-    time: "14:00",
-    pickup: "123 Main St",
-    destination: "456 Elm St",
-    seatsBooked: 3,
-    passengers: [
-        {
-            id: "1",
-            name: "Alice Johnson",
-            avatar: "/placeholder.svg?height=32&width=32",
-        },
-        {
-            id: "2",
-            name: "Bob Smith",
-            avatar: "/placeholder.svg?height=32&width=32",
-        },
-        {
-            id: "3",
-            name: "Carol Davis",
-            avatar: "/placeholder.svg?height=32&width=32",
-        },
-    ],
-};
-
 export default function ManageRideDialog({
     currentRide,
     // handleCancelRide,
@@ -95,17 +69,13 @@ export default function ManageRideDialog({
         setIsOpen(false);
     };
 
-    const onRemovePassenger = (passengerId: string) => {
-        const updatedPassengers = ride.passengers.filter(
-            (p) => p.id !== passengerId
+    const onRemovePassenger = (passenger) => {
+        const updatedBookings = ride.bookings.filter(
+            (p) => p.id !== passenger.id
         );
-        setRide({
-            ...ride,
-            passengers: updatedPassengers,
-            seatsBooked: updatedPassengers.length,
-        });
+        setRide((prev) => ({ ...prev, bookings: updatedBookings }));
+
         // Here you would typically update the passenger list in your backend
-        alert("Passenger removed successfully!");
     };
 
     const handleMessagePassenger = (passenger) => {
@@ -186,7 +156,6 @@ export default function ManageRideDialog({
                                             defaultValue={ride.scheduledFor
                                                 .split("T")[1]
                                                 .slice(0, 5)}
-                                            
                                             className="col-span-3"
                                         />
                                     </div>
@@ -249,16 +218,21 @@ export default function ManageRideDialog({
                                             className="flex items-center justify-between mb-4 p-2 rounded-lg hover:bg-accent"
                                         >
                                             <div className="flex items-center">
-                                            <Avatar>
-                            <AvatarImage
-                                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${passenger.user.username}`}
-                                alt={passenger.user.username}
-                            />
-                            <AvatarFallback>
-                                <User2 className="h-4 w-4" />
-                            </AvatarFallback>
-                        </Avatar>
-                                                <span>{passenger.user.username}</span>
+                                                <Avatar>
+                                                    <AvatarImage
+                                                        src={`https://api.dicebear.com/9.x/notionists/svg?seed=${passenger.user.username}`}
+                                                        alt={
+                                                            passenger.user
+                                                                .username
+                                                        }
+                                                    />
+                                                    <AvatarFallback>
+                                                        <User2 className="h-4 w-4" />
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <span>
+                                                    {passenger.user.name}
+                                                </span>
                                             </div>
                                             <div>
                                                 <Button
@@ -277,7 +251,7 @@ export default function ManageRideDialog({
                                                     size="icon"
                                                     onClick={() =>
                                                         onRemovePassenger(
-                                                            passenger.id
+                                                            passenger
                                                         )
                                                     }
                                                 >
