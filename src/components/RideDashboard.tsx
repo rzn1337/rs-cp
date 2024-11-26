@@ -105,6 +105,10 @@ const RideDashboard = ({ rides }) => {
         }
     };
 
+    const handleCancelRide = async (rideID) => {
+        console.log(rideID)
+    };
+
     const handleRemovePassenger = async (bookingID) => {
         try {
             const response = await axios.delete(
@@ -182,6 +186,9 @@ const RideDashboard = ({ rides }) => {
                                                     Start
                                                 </Button>
                                                 <ManageRideDialog
+                                                    handleCancelRide={
+                                                        handleCancelRide
+                                                    }
                                                     handleManageClick={
                                                         handleManageClick
                                                     }

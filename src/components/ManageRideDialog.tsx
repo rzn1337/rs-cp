@@ -42,10 +42,10 @@ import { Separator } from "@/components/ui/separator";
 
 export default function ManageRideDialog({
     currentRide,
-    // handleCancelRide,
+    handleCancelRide,
     handleUpdateRide,
     handleRemovePassenger,
-    handleManageClick
+    handleManageClick,
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [ride, setRide] = useState(currentRide);
@@ -96,16 +96,19 @@ export default function ManageRideDialog({
         alert("Group chat started with all passengers!");
     };
 
-    const onCancelRide = () => {
-        // Here you would typically cancel the ride in your backend
-        alert("Ride cancelled successfully!");
+    const onCancelRide = (rideID) => {
+        handleCancelRide(rideID);
         setIsOpen(false);
     };
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm" onClick={() => handleManageClick(currentRide)}>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleManageClick(currentRide)}
+                >
                     Manage
                 </Button>
             </DialogTrigger>
@@ -294,7 +297,7 @@ export default function ManageRideDialog({
                                                 Go back
                                             </AlertDialogCancel>
                                             <AlertDialogAction
-                                                onClick={onCancelRide}
+                                                onClick={() => onCancelRide(ride.id)}
                                             >
                                                 Yes, cancel ride
                                             </AlertDialogAction>

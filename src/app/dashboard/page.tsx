@@ -983,26 +983,11 @@ export default function Dashboard() {
                         <DialogTitle>Select Your Seat</DialogTitle>
                         <DialogDescription>
                             Choose your preferred seat. Premium seats are marked
-                            in yellow and cost 20% extra.
+                            in yellow and may cost extra.
                         </DialogDescription>
                     </DialogHeader>
                     {selectedRide && (
                         <div className="space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-sm font-medium">From</p>
-                                    <p className="text-sm text-gray-600">
-                                        {selectedRide.from}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium">To</p>
-                                    <p className="text-sm text-gray-600">
-                                        {selectedRide.to}
-                                    </p>
-                                </div>
-                            </div>
-
                             <SeatMap
                                 seats={selectedRide.vehicle.seats}
                                 isPremiumSeatsAvailable={
