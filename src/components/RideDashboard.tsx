@@ -106,7 +106,25 @@ const RideDashboard = ({ rides }) => {
     };
 
     const handleCancelRide = async (rideID) => {
-        console.log(rideID)
+        try {
+            await axios.patch("/api/update-ride-status", {
+                rideID,
+                status: "CANCELLED",
+            });
+            setUpcomingRides((prev) =>
+                prev.filter((ride) => ride.id !== rideID)
+            );
+            const cancelledRide = upcomingRides.find(
+                (ride) => ride.id === rideID
+            );
+            setPastRides((prev) => [
+                ...prev,
+                { ...cancelledRide, status: "CANCELLED" },
+            ]);
+            toast({ title: "You have cancelled a ride" });
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleRemovePassenger = async (bookingID) => {

@@ -123,7 +123,7 @@ enum RideStatus {
 model Route {
   id     String @id @default(cuid())
   rideID String @unique
-  ride   Ride   @relation(fields: [rideID], references: [id])
+  ride   Ride   @relation(fields: [rideID], references: [id], onDelete: Cascade)
   to     String
   from   String
 
