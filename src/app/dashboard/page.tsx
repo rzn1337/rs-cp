@@ -718,14 +718,14 @@ function RideCard({ ride, onBookRide }) {
                         </Avatar>
                         <div>
                             <h3 className="font-medium">
-                                {ride.driver.username}
+                                {ride.driver.name}
                             </h3>
-                            <div className="flex items-center">
+                            {/* <div className="flex items-center">
                                 <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                                 <span className="text-sm text-muted-foreground ml-1">
                                     4.85
                                 </span>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                     <Badge variant="secondary" className="ml-2">
@@ -904,6 +904,10 @@ export default function Dashboard() {
         fetchRides();
     }, [searchTerm]);
 
+    const handleSearch = async () => {
+        console.log(typeof searchTerm, typeof date);
+    };
+
     // const seats = [
     //     { id: 1, isTaken: false, isPremium: true },
     //     { id: 2, isTaken: false },
@@ -958,39 +962,39 @@ export default function Dashboard() {
                 </CardContent>
             </Card> */}
 
-<Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Search Rides</CardTitle>
-        <CardDescription>
-          Enter your travel details to find available rides
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-4 gap-4 mb-4">
-          <div className="col-span-3 relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              placeholder="Search by location or driver name"
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className="col-span-1 relative">
-            <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="date"
-              className="pl-8"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </div>
-        </div>
-        <Button className="w-full" >
-          Search Rides
-        </Button>
-      </CardContent>
-    </Card>
+            <Card className="mb-8">
+                <CardHeader>
+                    <CardTitle>Search Rides</CardTitle>
+                    <CardDescription>
+                        Enter your travel details to find available rides
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-4 gap-4 mb-4">
+                        <div className="col-span-3 relative">
+                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                            <Input
+                                placeholder="Search by location or driver name"
+                                className="pl-8"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className="col-span-1 relative">
+                            <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                            <Input
+                                type="date"
+                                className="pl-8"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <Button className="w-full" onClick={handleSearch}>
+                        Search Rides
+                    </Button>
+                </CardContent>
+            </Card>
 
             <ScrollArea className="h-[calc(100vh-400px)]">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

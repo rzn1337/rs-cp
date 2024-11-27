@@ -60,15 +60,22 @@ export async function GET(request: NextRequest) {
         //     });
 
         const rides = await prisma.ride.findMany({
-            where: { driverID: { not: userID },  status: "SCHEDULED", bookings: {none: {
-                userID: userID
-            }}},
+            where: {
+                driverID: { not: userID },
+                status: "SCHEDULED",
+                bookings: {
+                    none: {
+                        userID: userID,
+                    },
+                },
+            },
             select: {
                 id: true,
                 driver: {
                     select: {
                         id: true,
                         username: true,
+                        name: true,
                     },
                 },
                 vehicle: {

@@ -95,6 +95,22 @@ const data = {
                 },
             ],
         },
+        // {
+        //     title: "Complaints",
+        //     url: "#",
+        //     icon: CarFront,
+        //     isActive: true,
+        //     items: [
+        //         {
+        //             title: "Book a Ride",
+        //             url: "/dashboard",
+        //         },
+        //         {
+        //             title: "Create a New Ride",
+        //             url: "/ride-management",
+        //         },
+        //     ],
+        // },
         {
             title: "History",
             url: "#",
@@ -281,7 +297,7 @@ export default function RideshareSidebar() {
                             ))}
                         </SidebarMenu>
                     </SidebarGroup>
-                    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+                    {/* <SidebarGroup className="group-data-[collapsible=icon]:hidden">
                         <SidebarGroupLabel>Saved Locations</SidebarGroupLabel>
                         <SidebarMenu>
                             {data.savedLocations.map((item) => (
@@ -330,7 +346,7 @@ export default function RideshareSidebar() {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
-                    </SidebarGroup>
+                    </SidebarGroup> */}
                 </SidebarContent>
                 <SidebarFooter>
                     <SidebarMenu>
