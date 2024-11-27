@@ -59,12 +59,12 @@ export default function ComplaintsLayout() {
             <h1 className="text-2xl font-bold mb-4">Complaints</h1>
 
             <Tabs defaultValue="made" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                {/* <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="made">Complaints I Made</TabsTrigger>
                     <TabsTrigger value="against">
                         Complaints Against Me
                     </TabsTrigger>
-                </TabsList>
+                </TabsList> */}
                 <TabsContent value="made">
                     <ComplaintsTable
                         complaints={complaints}
