@@ -830,6 +830,7 @@ export default function Dashboard() {
     const [selectedRide, setSelectedRide] = useState(null);
     const [selectedSeat, setSelectedSeat] = useState(null);
     const [rides, setRides] = useState([]);
+    const [date, setDate] = useState("");
 
     const handleBookRide = (ride) => {
         setSelectedRide(ride);
@@ -920,7 +921,7 @@ export default function Dashboard() {
                 </p>
             </div>
 
-            <Card className="mb-8">
+            {/* <Card className="mb-8">
                 <CardHeader>
                     <CardTitle>Search Rides</CardTitle>
                     <CardDescription>
@@ -955,7 +956,41 @@ export default function Dashboard() {
                         />
                     </div>
                 </CardContent>
-            </Card>
+            </Card> */}
+
+<Card className="mb-8">
+      <CardHeader>
+        <CardTitle>Search Rides</CardTitle>
+        <CardDescription>
+          Enter your travel details to find available rides
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          <div className="col-span-3 relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Search by location or driver name"
+              className="pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="col-span-1 relative">
+            <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="date"
+              className="pl-8"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+        </div>
+        <Button className="w-full" >
+          Search Rides
+        </Button>
+      </CardContent>
+    </Card>
 
             <ScrollArea className="h-[calc(100vh-400px)]">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
