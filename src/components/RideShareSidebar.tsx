@@ -64,6 +64,7 @@ import {
     Briefcase,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const data = {
     accounts: [
@@ -413,10 +414,11 @@ export default function RideshareSidebar() {
                                     </DropdownMenuGroup>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuGroup>
+                                        <Link href="/profile">
                                         <DropdownMenuItem>
                                             <User />
                                             Profile
-                                        </DropdownMenuItem>
+                                        </DropdownMenuItem></Link>
                                         <DropdownMenuItem>
                                             <Shield />
                                             Safety Center
