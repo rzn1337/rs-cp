@@ -1145,7 +1145,7 @@ export default function UserProfile() {
                                     )}
                                 </div>
                             </ScrollArea>
-                            <Link href="/myrides">
+                            <Link href="/rides">
                                 <Button
                                     variant="outline"
                                     className="w-full mt-4"

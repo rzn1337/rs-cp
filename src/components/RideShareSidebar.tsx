@@ -118,11 +118,11 @@ const data = {
             items: [
                 {
                     title: "Recent Rides",
-                    url: "/myrides",
+                    url: "/rides",
                 },
                 {
                     title: "Recent Complaints",
-                    url: "/mycomplaints",
+                    url: "/complaints",
                 },
             ],
         },
