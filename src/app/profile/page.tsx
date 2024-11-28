@@ -1002,6 +1002,7 @@ export default function UserProfile() {
         const fetchUserProfileData = async () => {
             const response = await axios.get("/api/get-user-profile");
             setUserData(response.data.data);
+            setName(response.data.data.name);
         };
         try {
             fetchUserProfileData();
@@ -1058,7 +1059,31 @@ export default function UserProfile() {
         }
     };
 
-    return isLoading ?  (<div>Loading...</div>) : (
+    const [isEditing, setIsEditing] = useState(false);
+    const [name, setName] = useState(userData?.name || "");
+
+    const handleEditClick = async () => {
+        if (isEditing) {
+            try {
+                const response = await axios.patch("/api/update-user", {
+                    name: name,
+                });
+                console.log(name);
+                console.log(!isEditing);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        setIsEditing((prev) => !prev);
+    };
+
+    const handleNameChange = (e) => {
+        setName(e.target.value);
+    };
+
+    return isLoading ? (
+        <div>Loading...</div>
+    ) : (
         <div className="container mx-auto p-4">
             {/* Header Section */}
             <header className="flex justify-between items-center mb-8 p-6 bg-background rounded-lg shadow">
@@ -1073,7 +1098,16 @@ export default function UserProfile() {
                         </AvatarFallback>
                     </Avatar>
                     <div>
-                        <h1 className="text-3xl font-bold">{userData?.name}</h1>
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={handleNameChange}
+                                className="text-3xl font-bold border-b border-gray-300 focus:outline-none focus:border-blue-500"
+                            />
+                        ) : (
+                            <h1 className="text-3xl font-bold">{name}</h1>
+                        )}
                         <p className="text-muted-foreground text-sm">
                             @ {userData?.username}
                         </p>
@@ -1083,7 +1117,9 @@ export default function UserProfile() {
                         </p>
                     </div>
                 </div>
-                <Button>Edit Profile</Button>
+                <Button onClick={handleEditClick}>
+                    {isEditing ? "Save" : "Edit Profile"}
+                </Button>
             </header>
 
             {/* Main Content */}
