@@ -250,17 +250,37 @@ export default function AdminDashboard() {
         setFilteredUsers(filtered);
     };
 
-    const handleUserAction = (userId, action) => {
-        setFilteredUsers((prevUsers) =>
-            prevUsers.map((user) =>
-                user.id === userId
-                    ? {
-                          ...user,
-                          status: action === "suspend" ? "Suspended" : "Banned",
-                      }
-                    : user
-            )
-        );
+    const handleUserAction = async (user, action) => {
+        let response;
+        try {
+            if (user.status === "ACTIVE") {
+                setUsers((prev) =>
+                    prev.map((u) =>
+                        u.id === user.id ? { ...u, status: "SUSPENDED" } : u
+                    )
+                );
+                response = await axios.patch(
+                    `/api/update-account-status/${user.id}`,
+                    {
+                        status: "SUSPENDED",
+                    }
+                );
+            } else {
+                setUsers((prev) =>
+                    prev.map((u) =>
+                        u.id === user.id ? { ...u, status: "ACTIVE" } : u
+                    )
+                );
+                response = await axios.patch(
+                    `/api/update-account-status/${user.id}`,
+                    {
+                        status: "ACTIVE",
+                    }
+                );
+            }
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const [selectedTicket, setSelectedTicket] = useState(null);
@@ -480,17 +500,19 @@ export default function AdminDashboard() {
                                 <TableBody>
                                     {users?.map((user) => (
                                         <TableRow key={user.id}>
-                                            <TableCell>{user.username}</TableCell>
+                                            <TableCell>
+                                                {user.username}
+                                            </TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>
                                                 <Badge
                                                     variant={
-                                                        user.status === "Active"
+                                                        user.status === "ACTIVE"
                                                             ? "default"
                                                             : user.status ===
-                                                              "Suspended"
-                                                            ? "warning"
-                                                            : "destructive"
+                                                              "SUSPENDED"
+                                                            ? "destructive"
+                                                            : "default"
                                                     }
                                                 >
                                                     {user.status}
@@ -501,32 +523,29 @@ export default function AdminDashboard() {
                                                     variant="outline"
                                                     size="sm"
                                                     className="mr-2"
-                                                    onClick={() =>
-                                                        handleUserAction(
-                                                            user.id,
-                                                            "suspend"
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        user.status !== "Active"
-                                                    }
+                                                    onClick={() => {
+                                                        if (
+                                                            user.status ===
+                                                            "ACTIVE"
+                                                        ) {
+                                                            handleUserAction(
+                                                                user,
+                                                                "SUSPENDED"
+                                                            );
+                                                        } else {
+                                                            handleUserAction(
+                                                                user,
+                                                                "ACTIVE"
+                                                            );
+                                                        }
+                                                    }}
+                                                    /* disabled={
+                                                        user.status !== "ACTIVE"
+                                                    } */
                                                 >
-                                                    Suspend
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() =>
-                                                        handleUserAction(
-                                                            user.id,
-                                                            "ban"
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        user.status === "Banned"
-                                                    }
-                                                >
-                                                    Ban
+                                                    {user.status === "ACTIVE"
+                                                        ? "Suspend"
+                                                        : "Reinstate"}
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
