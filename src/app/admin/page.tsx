@@ -136,6 +136,7 @@ export default function AdminDashboard() {
     const [selectedComplaint, setSelectedComplaint] = useState(null);
     const [adminNote, setAdminNote] = useState("");
     const [adminStats, setAdminStats] = useState(null);
+    const [users, setUsers] = useState(null);
 
     const handleViewComplaintDetails = (complaint) => {
         setSelectedComplaint(complaint);
@@ -227,6 +228,16 @@ export default function AdminDashboard() {
             }
         };
         fetchComplaints();
+        const fetchUsers = async () => {
+            try {
+                const response = await axios.get("/api/get-users");
+                console.log(response);
+                setUsers(response.data.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchUsers();
     }, []);
 
     const handleSearch = (query) => {
@@ -324,6 +335,7 @@ export default function AdminDashboard() {
                     {/* <TabsTrigger value="tickets">Support Tickets</TabsTrigger> */}
                     <TabsTrigger value="users">User Management</TabsTrigger>
                 </TabsList>
+
                 <TabsContent value="complaints">
                     <Card>
                         <CardHeader>
@@ -459,18 +471,16 @@ export default function AdminDashboard() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>ID</TableHead>
-                                        <TableHead>Name</TableHead>
+                                        <TableHead>Username</TableHead>
                                         <TableHead>Email</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {/* {filteredUsers.map((user) => (
+                                    {users?.map((user) => (
                                         <TableRow key={user.id}>
-                                            <TableCell>{user.id}</TableCell>
-                                            <TableCell>{user.name}</TableCell>
+                                            <TableCell>{user.username}</TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>
                                                 <Badge
@@ -520,7 +530,7 @@ export default function AdminDashboard() {
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
-                                    ))} */}
+                                    ))}
                                 </TableBody>
                             </Table>
                         </CardContent>
