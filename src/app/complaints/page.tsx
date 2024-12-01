@@ -30,26 +30,6 @@ type Complaint = {
     complainant: string;
 };
 
-const complaints: Complaint[] = [
-    {
-        id: "1",
-        date: "Oct 15, 2024",
-        rideId: "RD123",
-        subject: "Late Arrival",
-        status: "PENDING",
-        description: "Driver was 30 minutes late without any communication.",
-        complainant: "John Doe",
-    },
-    {
-        id: "2",
-        date: "Sep 22, 2024",
-        rideId: "RD456",
-        subject: "Bad Behavior",
-        status: "RESOLVED",
-        description: "Driver was rude and unprofessional throughout the ride.",
-        complainant: "Jane Smith",
-    },
-];
 
 export default function ComplaintsLayout() {
     const [selectedComplaint, setSelectedComplaint] = useState(null);
@@ -178,6 +158,10 @@ function ComplaintDetailsModal({ complaint, onClose }) {
                     <div>
                         <span className="font-semibold">Description:</span>
                         <p className="mt-1">{complaint.description}</p>
+                    </div>
+                    <div>
+                        <span className="font-semibold">Admin Remarks:</span>
+                        <p className="mt-1">{complaint.adminNote}</p>
                     </div>
                     {/* <div className="flex items-center gap-2">
                         <UserIcon className="w-5 h-5 text-muted-foreground" />

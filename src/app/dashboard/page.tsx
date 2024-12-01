@@ -902,11 +902,18 @@ export default function Dashboard() {
         };
 
         fetchRides();
-    }, [searchTerm]);
+    }, []);
 
     const handleSearch = async () => {
-        console.log(typeof searchTerm, typeof date);
-    };
+        try {
+          const response = await axios.get("/api/get-public-rides", {
+            params: { searchTerm, date },
+          });
+          setRides(response.data.data);
+        } catch (error) {
+          console.error("Error fetching filtered rides:", error);
+        }
+      };
 
     // const seats = [
     //     { id: 1, isTaken: false, isPremium: true },
