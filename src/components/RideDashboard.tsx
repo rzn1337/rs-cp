@@ -298,7 +298,7 @@ const RideDashboard = ({ rides }) => {
                                                     <strong>
                                                         Seats Booked:
                                                     </strong>{" "}
-                                                    {ride.seatsBooked}
+                                                    {ride.bookings.length}
                                                 </p>
                                                 <p>
                                                     <strong>
@@ -313,7 +313,7 @@ const RideDashboard = ({ rides }) => {
                                                         0
                                                     )}
                                                 </p>
-                                                <div className="mt-2 flex items-center">
+                                                {/* <div className="mt-2 flex items-center">
                                                     <span className="mr-2">
                                                         Rating:
                                                     </span>
@@ -332,7 +332,7 @@ const RideDashboard = ({ rides }) => {
                                                             )
                                                         )}
                                                     </span>
-                                                </div>
+                                                </div> */}
                                             </div>
                                         )}
                                     </div>
