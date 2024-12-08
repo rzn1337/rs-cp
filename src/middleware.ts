@@ -16,7 +16,10 @@ export async function middleware(request: NextRequest) {
 
         console.log("token", payload);
         if (path === "/admin" && payload.role !== "ADMIN") {
-            return NextResponse.redirect(new URL("/dashboard", request.url));
+            return NextResponse.redirect(new URL("/unauthorized", request.url));
+        }
+        if (payload.status !== "ACTIVE") {
+            return NextResponse.redirect(new URL("/unauthorized", request.url));
         }
     }
 
@@ -39,7 +42,7 @@ export const config = {
         "/sign-up",
         "/dashboard",
         "/admin",
-        "/myrides",
+        "/rides",
         "/profile",
         "/admin",
     ],
