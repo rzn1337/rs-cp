@@ -448,9 +448,9 @@ export default function AdminDashboard() {
                                                             View details
                                                         </DropdownMenuItem>
 
-                                                        <DropdownMenuItem>
+                                                        {/* <DropdownMenuItem>
                                                             Resolve
-                                                        </DropdownMenuItem>
+                                                        </DropdownMenuItem> */}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>

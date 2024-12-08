@@ -32,6 +32,7 @@ export async function POST(request: Request) {
             id: user.id,
             username: user.username,
             email: user.email,
+            role: user.role
         };
 
         const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
